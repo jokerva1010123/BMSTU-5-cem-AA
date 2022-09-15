@@ -1,0 +1,200 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут указаны средства реализации, будут представлены листинги кода, а также функциональные тесты.
+
+\section{Средства реализации}
+
+Реализация данной лабораторной работы выполнялась при помощи языка программирования Python \cite{python}. Выбор ЯП обусловлен простотой синтаксиса, большим числом библиотек и эффективностью визуализации данных.
+
+Замеры времени проводились при помощи функции process\_time из библиотеки time \cite{python-time}.
+
+\section{Сведения о модулях программы}
+
+Программа состоит из следующих модулей:
+
+\begin{itemize}
+	\item main.py - главный файл программы, предоставляющий пользователю меню для выполнения основных функций;
+	\item matrix.py - файл, содержащий функции работы с матрицами;
+	\item time\_test.py - файл, содержащий функции замеров времени работы указанных алгоритмов;
+	\item graph\_result.py - файл, содержащий функции визуализации временных характеристик описанных алгоритмов.
+\end{itemize}
+
+\section{Листинги кода}
+
+Стандартный алгоритм, алгоритм Винограда и оптимизированный алгоритм Винограда умножения матриц приведены в листингах \ref{lst:standard}-\ref{lst:optimized}.
+
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:standard,caption=Стандартный алгоритм умножения матриц]
+def standard_mult(A, B):
+    n = len(A)
+    m = len(B[0])
+    p = len(A[0])
+
+    C = [[0] * m for i in range(n)]
+
+    for i in range(n):
+        for j in range(m):
+            for k in range(p):
+                C[i][j] += A[i][k] * B[k][j]
+
+    return C
+\end{lstlisting} 
+\end{center}
+\clearpage
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:winograd,caption=Алгоритм Винограда умножения матриц]
+def winograd_mult(A, B):
+    n = len(A)
+    m = len(B[0])
+    p = len(A[0])
+
+    C = [[0] * m for _ in range(n)]
+
+    row_factors = [0] * n
+
+    for i in range(n):
+        for j in range(p // 2):
+            row_factors[i] = row_factors[i] + \
+                             A[i][2 * j] * A[i][2 * j + 1]
+
+    column_factors = [0] * m
+
+    for i in range(m):
+        for j in range(p // 2):
+            column_factors[i] = column_factors[i] + \
+                                B[2 * j][i] * B[2 * j + 1][i]
+
+    for i in range(n):
+        for j in range(m):
+            C[i][j] = -row_factors[i] - column_factors[j]
+
+            for k in range(p // 2):
+                C[i][j] = C[i][j] + (A[i][2 * k + 1] + B[2 * k][j]) * \
+                                    (A[i][2 * k] + B[2 * k + 1][j])
+    
+    if p % 2 != 0:
+        for i in range(n):
+            for j in range(m):
+                C[i][j] = C[i][j] + A[i][p - 1] * B[p - 1][j]
+    
+    return C
+\end{lstlisting}
+\end{center}
+\clearpage
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:optimized,caption=Оптимизированный алгоритм Винограда умножения матриц]
+def optimized_winograd_mult(A, B):
+    n = len(A)
+    m = len(B[0])
+    p = len(A[0])
+
+    C = [[0] * m for _ in range(n)]
+
+    row_factors = [0] * n
+
+    for i in range(n):
+        for j in range(1, p, 2):
+            row_factors[i] += A[i][j] * A[i][j - 1]
+
+    column_factors = [0] * m
+
+    for i in range(m):
+        for j in range(1, p, 2):
+            column_factors[i] += B[j][i] * B[j - 1][i]
+
+    flag = p % 2
+
+    for i in range(n):
+        for j in range(m):
+            C[i][j] = -(row_factors[i] + column_factors[j])
+
+            for k in range(1, p, 2):
+                C[i][j] += (A[i][k - 1] + B[k][j]) * \
+                                    (A[i][k] + B[k - 1][j])
+    
+            if flag:
+                C[i][j] += A[i][p - 1] * B[p - 1][j]
+    
+    return C
+\end{lstlisting}
+\end{center}
+
+\section{Функциональные тесты}
+
+В таблице \ref{tbl:func_test} приведены функциональные тесты для функций, реализующих алгоритмы умножения матриц. Все тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+		\captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:func_test} Функциональные тесты}
+		\begin{tabular}{|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|}
+			\hline
+			Матрица A & Матрица B & Ожидаемый результат \\ 
+			\hline
+			$\begin{pmatrix}
+				&
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				&
+			\end{pmatrix}$ &
+			Сообщение об ошибке \\ \hline
+
+			$\begin{pmatrix}
+				&
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 & 2\\
+				3 & 4\\
+				5 & 6
+			\end{pmatrix}$ &
+			Сообщение об ошибке \\ \hline
+
+			$\begin{pmatrix}
+				1 & 0 & 1
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				-1 & 0 & -1
+			\end{pmatrix}$ &
+			Сообщение об ошибке \\ \hline
+
+			$\begin{pmatrix}
+				1 & 2 & 3 \\
+				4 & 5 & 6 \\
+				7 & 8 & 9
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				-1 & -2 & -3 \\
+				-4 & -5 & -6 \\
+				-7 & -8 & -9
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				-30 & -36 & -42 \\
+				-66 & -81 & -96 \\
+				-102 & -126 & -150
+			\end{pmatrix}$ \\ \hline
+
+			$\begin{pmatrix}
+				1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 \\
+				2 \\
+				3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				14 \\
+			\end{pmatrix}$ \\ \hline
+
+		\end{tabular}
+		\end{threeparttable}
+	\end{center}
+	
+\end{table}
+
+\section{Вывод}
+
+Были реализованы функции алгоритмов умножения матриц. Было проведено функциональное тестирование указанных функций.

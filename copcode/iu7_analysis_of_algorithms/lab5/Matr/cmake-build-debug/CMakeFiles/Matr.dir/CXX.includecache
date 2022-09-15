@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/viktoriamhitaran/Desktop/АА/lab5/Matr/Winograd.h
+matrix.h
+/Users/viktoriamhitaran/Desktop/АА/lab5/Matr/matrix.h
+thread
+-
+memory
+-
+
+/Users/viktoriamhitaran/Desktop/АА/lab5/Matr/main.cpp
+Winograd.h
+/Users/viktoriamhitaran/Desktop/АА/lab5/Matr/Winograd.h
+chrono
+-
+ctime
+-
+
+/Users/viktoriamhitaran/Desktop/АА/lab5/Matr/matrix.h
+iostream
+-
+vector
+-
+

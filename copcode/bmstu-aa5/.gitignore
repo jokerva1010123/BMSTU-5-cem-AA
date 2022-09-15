@@ -1,0 +1,6 @@
+*out/
+*Literature/
+*ToShow/
+*__pycache__/
+*build-*/
+*.sla

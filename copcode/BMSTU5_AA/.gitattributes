@@ -1,0 +1,5 @@
+*.tex linguist-documentation
+*/report/* linguist-documentation
+/report/* linguist-documentation
+шаблон_отчета/* linguist-documentation
+lab_01/report/* linguist-documentation

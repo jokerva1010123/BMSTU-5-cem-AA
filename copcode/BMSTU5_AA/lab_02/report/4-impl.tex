@@ -1,0 +1,159 @@
+\chapter{ Технологический раздел}
+\label{cha:design}
+
+\section{Выбор ЯП}
+
+В данной лабораторной работе использовался язык программирования - python \cite{bib1}.
+Я знакома с данным языком.
+Поэтому данный язык был выбран. 
+В качестве среды разработки я использовала Visual Studio Code \cite{bib2}, т.к. считаю его достаточно удобным и легким.
+Visual Studio Code подходит не только для  Windows \cite{bib3}, но и для Linux \cite{bib4}, это еще одна причина, по которой я выбрала VS code, т.к. у меня установлена ОС Ubuntu 18.04.4 \cite{bib5}.
+
+\section{Требования к программному обеспечению}
+
+Входными данными являются две матрицы A и B.
+Количество столбцов матрицы A долджно быть равно количеству строк матрицы B. 
+
+На выходе получается результат умножения, введенных пользователем, матриц.
+
+\section{Сведения о модулях программы}
+
+Данная программа разбита на модули.
+
+\begin{itemize}
+    \item main.py - файл, содержащий точку входа в программу. В нем происходит общение с пользователем и вызов алгоритмов.
+    \item matrix.py - файл, содержащий класс matrix.
+    \item matrix\_multiplication.py - файл, содержащий реализации алгоритмов умножения матриц.
+\end{itemize}
+
+На листингах 3.1-3.4 представлен код программы.
+
+\begin{lstlisting}[label=some-code,caption=Главная функция main]
+def main():
+    output("МАТРИЦА A", BLUE)
+    n = int(input(GREEN + "Введите кол-во строк: "))
+    m = int(input(GREEN + "Введите кол-во столбцов: "))
+    output("Введите матрицу:", GREEN)
+    matrixA = Matrix(n, m, [[int(j) for j in input(GREEN).split()]
+                            for i in range(n)])
+
+    output("МАТРИЦА B", BLUE)
+    k = int(input(GREEN + "Введите кол-во строк: "))
+    l = int(input(GREEN + "Введите кол-во столбцов: "))
+    output("Введите матрицу:", GREEN)
+    matrixB = Matrix(k, l, [[int(j) for j in input(GREEN).split()]
+                            for i in range(k)])
+
+    if m != k:
+        output("Некорректные размеры матриц!", RED)
+        return
+
+    matrixC = multiplication(matrixA, matrixB)
+    matrixC.output()
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Класс matrix]
+class Matrix:
+    n, m = 0, 0
+    matrix = list()
+
+    def __init__(self, n, m, list_of_lists=None):
+        self.n, self.m = n, m
+        if list_of_lists:
+            self.matrix = deepcopy(list_of_lists)
+        else:
+            self.matrix = np.full((n, m), 0)
+
+    def output(self):
+        print(TURQUOISE, end='')
+        for i in range(self.n):
+            for j in range(self.m):
+                print(self.matrix[i][j], end=' ')
+            print()
+
+    def fill(self, list_of_lists):
+        self.matrix = deepcopy(list_of_lists)
+
+    def size(self):
+        return (self.n, self.m)
+
+    def __getitem__(self, index):
+        return self.matrix[index]
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Стандарный алгоритм умножения матриц]
+    def multiplication(matrixA, matrixB):
+        n = matrixA.n
+        m = matrixB.m
+        q = matrixB.n
+
+        matrixC = Matrix(n, m)
+
+        for i in range(n):
+            for j in range(m):
+                for k in range(q):
+                    matrixC[i][j] += (matrixA[i][k] * matrixB[k][j])
+
+        return matrixC
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Алгоритм Винограда]
+    def WinogradMult(matrixA, matrixB):
+        n = matrixA.n
+        m = matrixB.m
+        q = matrixB.n
+
+        matrixC = Matrix(n, m)
+
+        tempA = np.full(n, 0)
+        for i in range(n):
+            for j in range(1, q, 2):
+                tempA[i] += matrixA[i][j - 1] * matrixA[i][j]
+
+        tempB = np.full(m, 0)
+        for i in range(m):
+            for j in range(1, q, 2):
+                tempB[i] += matrixB[j - 1][i] * matrixB[j][i]
+
+        for i in range(n):
+            for j in range(m):
+                matrixC[i][j] -= (tempA[i] + tempB[j])
+                for k in range(1, q, 2):
+                    matrixC[i][j] += (matrixA[i][k-1] + matrixB[k][j]) * \
+                        (matrixA[i][k] + matrixB[k-1][j])
+        if q % 2:
+            for i in range(n):
+                for j in range(m):
+                    matrixC[i][j] += matrixA[i][q-1] * matrixB[q-1][j]
+
+        return matrixC
+\end{lstlisting}
+
+\section{Тестирование}
+
+В данном разделе будет приведена таблица с тестами (таблица \ref{table:ref1}).
+% \ref{table:ref1}, в которой четко отражено тестирование программы
+
+\begin{table}[ht]
+    \centering
+    \caption{Таблица тестов}
+    \label{table:ref1}
+    \begin{tabular}{ | l | l | l |}
+        \hline
+        Матрица A       & Матрица B           & Результат                               \\ \hline
+        2 2 1 0 0 1     & 2 2 1 0 0 1         & Ответ верный                            \\ \hline
+        3 2 2 3 1 0 2 2 & 2 4 2 2 1 9 4 2 8 1 & Ответ верный                            \\ \hline
+        2 1 2 1         & 12 12               & Ответ верный                            \\ \hline
+        2 2 1 0 0 1     & 1 1 0               & Сообщение о неверном вводе размерностей \\ \hline
+        0 0             & 0 0                 &                                         \\ \hline
+        \hline
+    \end{tabular}
+\end{table}
+
+Все тесты пройдены.
+
+\section{Вывод}
+
+В данном разделе был разобран выбор языка программирования, а также среды разработки.
+Разобраны требования к программному обеспечению.
+Протестированная программа. 

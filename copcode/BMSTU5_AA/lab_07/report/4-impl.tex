@@ -1,0 +1,112 @@
+\chapter{Технологическая часть}
+
+\section{Выбор ЯП}
+
+В данной лабораторной работе использовался язык программирования - python. \cite{Python}
+Я знакома с ним.
+Поэтому данный язык был выбран.
+В качестве среды разработки я использовала Visual Studio Code \cite{Vs}.
+Visual Studio Code подходит не только для  Windows \cite{Win},
+но и для Linux \cite{Lin}, это причина,
+по которой я выбрала VS code,
+т.к. у меня установлена ОС Ubuntu 18.04.4 \cite{Ubuntu}.
+В моей архитектуре присутствует 8 ядер.
+
+\section{Сведения о модулях программы}
+
+Данная программа разбита на модули.
+
+\begin{itemize}
+	\item main.py - главный файл, содержащий точку входа в программу.
+	\item dictionary.py - файл, содержащий класс dictionary.
+	\item world\_info.py - файл, содержащий класс, который описывает информацию о игре.
+\end{itemize}
+
+На листингах 3.1-3.4 представлен основной код программы.
+
+
+\begin{lstlisting}[label=some-code,caption=Поиск полным перебором]
+def SequentialSearch(self, key):
+for elem in self.data:
+	if key == elem:
+		return self.data[elem]
+return -1
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Бинарный поиск]
+def BinarySearch(self, key, list_keys):
+	l, r = 0, len(list_keys) - 1
+
+	while l <= r:
+		middle = (l + (r - l) // 2)  
+
+		if list_keys[middle] == key:
+			return self.data[elem]
+
+		elif list_keys[middle] < key:
+			l = middle + 1
+		
+		else:
+			r = middle - 1
+
+	return -1
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Оптимизация бинарного поиска]
+def BinarySearch(self, key, list_keys, l, r): 
+	while l <= r:
+		middle = (r + l) // 2 # Optimization.
+		elem = list_keys[middle] # Optimization.
+
+		if elem == key:
+			return self.data[elem]
+
+		elif elem < key:
+			l = middle + 1
+
+		else:
+			r = middle - 1
+
+	return -1
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Частичный анализ]
+def Search(self, key, new_dict):
+	# Loop by letter
+	for k in new_dict:
+		if key[0] == k:
+			for elem in new_dict[k]:
+				if elem == key:
+					return new_dict[k][elem]
+			return -1
+	
+	return -1
+\end{lstlisting}
+
+
+\section{Тестирование}
+
+В данном разделе будет приведена таблица с тестами (таблица \ref{table:ref1}).
+
+\begin{table}[ht]
+	\centering
+	\caption{Таблица тестов}
+	\label{table:ref1}
+	\begin{tabular}{ | l | l | l |}
+		\hline
+		Входные данные                        & Пояснение              & Результат    \\ \hline
+		A Good Librarian Like a Good Shepherd & Первый элемент         & Ответ верный \\ \hline
+		Championship Manager 2008             & Средний элемент        & Ответ верный \\ \hline
+		Patapon 3                             & Последний элемент      & Ответ верный \\ \hline
+		Adrift                                & Произвольный элемент   & Ответ верный \\ \hline
+		Adrift 333                            & Несуществующий элемент & Ответ верный \\ \hline
+		\hline
+	\end{tabular}
+\end{table}
+
+Все тесты пройдены.
+
+\section{Вывод}
+
+В данном разделе были разобраны листинги рис 3.1-3.4, показывающие работу каждого алгоритма и
+приведена таблица с тестами (таблица \ref{table:ref1})..

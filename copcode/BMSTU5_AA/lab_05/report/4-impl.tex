@@ -1,0 +1,119 @@
+\chapter{Технологическая часть}
+
+\section{Выбор ЯП}
+
+В данной лабораторной работе использовался язык программирования - C\# \cite{Microsoft}.
+Данный язык был выбран, потому что он является нативным.
+В качестве среды разработки я использовала Visual Studio Code \cite{Vs}.
+Visual Studio Code подходит не только для  Windows \cite{Win},
+но и для Linux \cite{Lin}, это причина,
+по которой я выбрала VS code,
+т.к. у меня установлена ОС Ubuntu 18.04.4 \cite{Ubuntu}.
+В моей архитектуре присутствует 8 ядер.
+
+% Время работы алгоритмов было замерено с помощью класса Stopwatch. Многопоточное программирование было
+% реализовано с помощью пространства имен System.Threading.
+
+\section{Сведения о модулях программы}
+
+Данная программа состоит из файла Program.cs, который содержит код программы.
+
+На листингах 3.1-3.2 представлен основной код программы.
+
+\begin{lstlisting}[label=some-code,caption=Метод создания и запуска потоков]
+public static void MainTread(Queue<intPtr> queue)
+{
+	Console.WriteLine("Process:\n");
+	
+	ThreadArgs args = new ThreadArgs(queue);
+	
+	Thread firstThread = new Thread(new ParameterizedThreadStart(Conveyor));
+	Thread secondThread = new Thread(new ParameterizedThreadStart(Conveyor));
+	Thread thirdThread = new Thread(new ParameterizedThreadStart(Conveyor));
+	
+	firstThread.Start(args);
+	secondThread.Start(args);
+	thirdThread.Start(args);
+
+	while (args.firstQueue.Count != 0)
+	{
+		if (!firstThread.IsAlive)
+		{
+			firstThread = new Thread(new ParameterizedThreadStart(Conveyor));
+			firstThread.Start(args);
+		}
+	
+		if (!secondThread.IsAlive)
+		{
+			secondThread = new Thread(new ParameterizedThreadStart(Conveyor));
+			secondThread.Start(args);
+		}
+	
+		if (!thirdThread.IsAlive)
+		{
+			thirdThread = new Thread(new ParameterizedThreadStart(Conveyor));
+			thirdThread.Start(args);
+		}
+	}
+	
+	firstThread.Join(); secondThread.Join(); thirdThread.Join();
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Конвейер]
+public static void Conveyor(object obj)
+{
+	ThreadArgs args = (ThreadArgs)obj;
+	int max, min, count;
+	intPtr array;
+
+	lock (args.firstQueue)
+	{
+		// Get array from the first queue.
+		array = args.firstQueue.Dequeue();
+	}
+
+	lock (firstStage)
+	{
+		// The first tape is running.
+		max = FindMax(array);
+	}
+
+	lock (args.secondQueue)
+	{
+		// Added element to the second queue.
+		args.secondQueue.Enqueue(array);
+	}
+
+	lock (secondStage)
+	{
+		// The second tape is running.
+		lock (args.secondQueue)
+		{
+			// Get array from the second queue.
+			array = args.secondQueue.Dequeue();
+		}
+		min = FindMin(array);
+	}
+
+	lock (args.thirdQueue)
+	{
+		args.thirdQueue.Enqueue(array);
+	}
+
+	lock (thirdStage)
+	{
+		lock (args.thirdQueue)
+		{
+			array = args.thirdQueue.Dequeue();
+		}
+		count = FindCount(array, (max - min) / 2);
+	}
+}
+\end{lstlisting}
+
+
+
+\section{Вывод}
+
+В данном разделе были разобраны листинги рис 3.1-3.2, показывающие работу конвейера.

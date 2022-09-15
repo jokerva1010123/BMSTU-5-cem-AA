@@ -1,0 +1,276 @@
+\chapter{Технологическая часть}
+
+\section{Выбор ЯП}
+
+\section{Выбор языка программирования}
+В данной лабораторной работе использовался язык программирования - С  \cite{Microsoft},
+так как данный язык программирования предоставляет удобные библиотеки и инструменты для
+работы со структурами данных и обеспечивает хорошую производительность программного продукта.
+В качестве среды разработки я использовала Visual Studio Code \cite{Vs}.
+Visual Studio Code подходит не только для  Windows \cite{Win},
+но и для Linux \cite{Lin}, это причина,
+по которой я выбрала VS code,
+т.к. у меня установлена ОС Ubuntu 18.04.4 \cite{Ubuntu}.
+
+\section{Сведения о модулях программы}
+
+Программа состоит из следующих модулей:
+
+\begin{itemize}
+	\item main.c - главный файл программы, в котором располагается точка входа в программу;
+	\item ant\_algorithm.c - реализация муравьиного алгоритма;
+	\item brute\_force.c - реализация алгоритма полного перебора;
+	\item matrix.c - модуль для работы с матрицей смежности;
+	\item array.c - модуль для организации списка;
+	\item city.c - модуль для организации списка городов;
+	\item parser.c - модуль для представления результата в графическом виде.
+\end{itemize}
+
+На листингах 3.1-3.3 представлен основной код программы.
+
+
+\begin{lstlisting}[label=some-code,caption=Алгоритм полного перебора]
+int get_path_cost(array cities, int matrix[LEN][LEN])
+{
+	int cost = 0;
+
+	for (int i = 0; i < cities.count - 1; i++)
+		cost += matrix[cities.arr[i]][cities.arr[i + 1]];
+
+	return cost;
+}
+
+array get_shortest_path(array cities, int matrix[LEN][LEN])
+{
+	array result[DEPTH_OF_RECURSION];
+	array res_arr;
+
+	int min_cost;
+	int curr_cost;
+	int index = 0;
+
+	int routes_count = 0;
+
+	del_elem(&cities, 0);
+	add_elem(&res_arr, 0);
+	get_routes(&cities, &res_arr, result, &routes_count);
+
+	min_cost = get_path_cost(result[index], matrix);
+	for (int i = 1; i < routes_count; i++)
+	{
+		curr_cost = get_path_cost(result[i], matrix);
+		if (curr_cost < min_cost)
+		{
+			min_cost = curr_cost;
+			index = i;
+		}
+	}
+
+	return result[index];
+}
+
+void get_routes(array *cities, array *res_arr, array result[DEPTH_OF_RECURSION], int *count)
+{
+	int elem;
+	array tmp;
+
+	if (!cities->count)
+	{
+		add_elem(res_arr, get_elem(*res_arr, 0));
+		result[*count] = *res_arr;
+		(*count)++;
+		del_elem(res_arr, res_arr->count - 1);
+	}
+
+	for (int i = 0; i < cities->count; i++)
+	{
+		elem = get_elem(*cities, i);
+		add_elem(res_arr, elem);
+
+		tmp = copy_arr(*cities);
+		del_elem(&tmp, i);
+
+		get_routes(&tmp, res_arr, result, count);
+
+		del_elem(res_arr, res_arr->count - 1);
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Функции для работы с муравьями]
+void generate_ants_array(ant ants[ANTS_MAX_COUNT], int count)
+{
+	int elem;
+	for (int i = 0; i < count; i++)
+	{
+		ants[i].way.count = 0;
+		ants[i].route.count = 0;
+		elem = rand() % count;
+		add_elem(&(ants[i].way), elem);
+		for (int j = 0; j < count; j++)
+		{
+			if (j == elem)
+				continue;
+			add_elem(&(ants[i].route), j);
+		}
+	}
+}
+
+void choice_next_city(ant *ants, float matrix_pheromones[LEN][LEN], int matrix[LEN][LEN], float alpha, float beta)
+{
+	float numerator = 0;
+	float denominator = 0;
+
+	float tao, reverse_cost;
+	int cost;
+
+	int city_curr = ants->way.arr[ants->way.count - 1];
+	for (int i = 0; i < ants->route.count; i++)
+	{
+		cost = matrix[city_curr][ants->route.arr[i]];
+		tao = matrix_pheromones[city_curr][ants->route.arr[i]];
+
+		if (!cost)
+			continue;
+
+		reverse_cost = 1.0 / cost;
+
+		denominator += powf(tao, alpha) + powf(reverse_cost, beta);
+	}
+
+	float p_array[LEN];
+	float sum = 0;
+	for (int i = 0; i < ants->route.count; i++)
+	{
+		cost = matrix[city_curr][ants->route.arr[i]];
+		tao = matrix_pheromones[city_curr][ants->route.arr[i]];
+
+		if (!cost)
+			continue;
+
+		reverse_cost = 1.0 / cost;
+		p_array[i] = (powf(tao, alpha) + powf(reverse_cost, beta)) / denominator;
+		sum += p_array[i];
+	}
+	float x = (float)rand() / RAND_MAX;
+	int index = 0;
+	while (x >= 0)
+	{
+		x -= p_array[index];
+		index++;
+	}
+	add_elem(&ants->way, get_elem(ants->route, index - 1));
+	del_elem(&ants->route, index - 1);
+}
+
+void ants_choose_way(ant ants[ANTS_MAX_COUNT], float matrix_pheromones[LEN][LEN], int matrix[LEN][LEN], int count, float alpha, float beta)
+{
+	for (int i = 0; i < count; i++)
+		choice_next_city(&ants[i], matrix_pheromones, matrix, alpha, beta);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Муравьиный алгоритм]
+int calculate_Q(int matrix[LEN][LEN], int count)
+{
+	int Q = 0;
+
+	for (int i = 0; i < count; i++)
+		for (int j = 0; j < i; j++)
+			Q += matrix[i][j];
+
+	return Q * 2;
+}
+
+void add_pheromones(int matrix[LEN][LEN], float matrix_pheromones[LEN][LEN], int count, int Q, ant ants[ANTS_MAX_COUNT])
+{
+	int city_first, city_second;
+	int curr_cost;
+	float delta_tao = 0;
+
+	for (int i = 0; i < count; i++)
+	{
+		curr_cost = get_path_cost(ants[i].way, matrix);
+
+		delta_tao += (float)Q / curr_cost;
+	}
+
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < ants[i].way.count - 1; j++)
+		{
+			city_first = ants[i].way.arr[j];
+			city_second = ants[i].way.arr[j + 1];
+			matrix_pheromones[city_first][city_second] = matrix_pheromones[city_first][city_second] + delta_tao;
+			matrix_pheromones[city_second][city_first] = matrix_pheromones[city_second][city_first] + delta_tao;
+		}
+	}
+}
+
+void correct_pheromones(float matrix_pheromones[LEN][LEN], int count)
+{
+	for (int i = 0; i < count; i++)
+		for (int j = 0; j < i; j++)
+			if (matrix_pheromones[i][j] <= 0.1)
+				matrix_pheromones[i][j] = matrix_pheromones[j][i] = 0.1;
+}
+
+void evaporation(float matrix_pheromones[LEN][LEN], int count, float p)
+{
+	float tmp = 1 - p;
+	for (int i = 0; i < count; i++)
+		for (int j = 0; j < i; j++)
+		{
+			matrix_pheromones[i][j] = tmp * matrix_pheromones[i][j];
+			matrix_pheromones[j][i] = tmp * matrix_pheromones[j][i];
+		}
+}
+array ant_algorithm(int matrix[LEN][LEN], int count, array cities, int tmax, float p, float alpha, float beta)
+{
+	int Q = calculate_Q(matrix, count);
+
+	array best_way = copy_arr(cities);
+	add_elem(&best_way, get_elem(best_way, 0));
+
+	int best_cost = get_path_cost(best_way, matrix);
+	int curr_cost = 0;
+
+	float matrix_pheromones[LEN][LEN];
+	fill_matrix(matrix_pheromones, count, PHEROMONE_MIN);
+
+	ant ants[ANTS_MAX_COUNT];
+
+	for (int t = 0; t < tmax; t++)
+	{
+		generate_ants_array(ants, count);
+
+		for (int i = 0; i < count - 1; i++)
+		{
+			ants_choose_way(ants, matrix_pheromones, matrix, count, alpha, beta);
+		}
+		for (int i = 0; i < count; i++)
+			add_elem(&ants[i].way, get_elem(ants[i].way, 0));
+
+		for (int i = 0; i < count; i++)
+		{
+			curr_cost = get_path_cost(ants[i].way, matrix);
+			if (curr_cost < best_cost)
+			{
+				best_cost = curr_cost;
+				best_way = copy_arr(ants[i].way);
+			}
+		}
+
+		evaporation(matrix_pheromones, count, p);
+		add_pheromones(matrix, matrix_pheromones, count, Q, ants);
+		correct_pheromones(matrix_pheromones, count);
+	}
+
+	return best_way;
+}
+\end{lstlisting}
+
+
+\section{Вывод}
+
+В данном разделе были разобраны листинги рис 3.1-3.2, показывающие работу алгоритмов для решения задачи коммивояжера.

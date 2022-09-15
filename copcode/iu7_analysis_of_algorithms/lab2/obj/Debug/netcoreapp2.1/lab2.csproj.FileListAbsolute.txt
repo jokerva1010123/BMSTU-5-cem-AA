@@ -1,0 +1,11 @@
+/Users/viktoriamhitaran/Desktop/АА/lab2/bin/Debug/netcoreapp2.1/lab2.deps.json
+/Users/viktoriamhitaran/Desktop/АА/lab2/bin/Debug/netcoreapp2.1/lab2.runtimeconfig.json
+/Users/viktoriamhitaran/Desktop/АА/lab2/bin/Debug/netcoreapp2.1/lab2.runtimeconfig.dev.json
+/Users/viktoriamhitaran/Desktop/АА/lab2/bin/Debug/netcoreapp2.1/lab2.dll
+/Users/viktoriamhitaran/Desktop/АА/lab2/bin/Debug/netcoreapp2.1/lab2.pdb
+/Users/viktoriamhitaran/Desktop/АА/lab2/obj/Debug/netcoreapp2.1/lab2.csprojAssemblyReference.cache
+/Users/viktoriamhitaran/Desktop/АА/lab2/obj/Debug/netcoreapp2.1/lab2.csproj.CoreCompileInputs.cache
+/Users/viktoriamhitaran/Desktop/АА/lab2/obj/Debug/netcoreapp2.1/lab2.AssemblyInfoInputs.cache
+/Users/viktoriamhitaran/Desktop/АА/lab2/obj/Debug/netcoreapp2.1/lab2.AssemblyInfo.cs
+/Users/viktoriamhitaran/Desktop/АА/lab2/obj/Debug/netcoreapp2.1/lab2.dll
+/Users/viktoriamhitaran/Desktop/АА/lab2/obj/Debug/netcoreapp2.1/lab2.pdb

@@ -1,0 +1,9 @@
+*.dat
+*.aux
+*.log
+*.toc
+*.dvi
+*.gz
+*.exe
+*.out
+*.o

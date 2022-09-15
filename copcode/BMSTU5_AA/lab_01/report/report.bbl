@@ -1,0 +1,47 @@
+\begin{thebibliography}{1}
+\def\selectlanguageifdefined#1{
+\expandafter\ifx\csname date#1\endcsname\relax
+\else\language\csname l@#1\endcsname\fi}
+\ifx\undefined\url\def\url#1{{\small #1}}\else\fi
+\ifx\undefined\BibUrl\def\BibUrl#1{\url{#1}}\else\fi
+\ifx\undefined\BibAnnote\long\def\BibAnnote#1{}\else\fi
+\ifx\undefined\BibEmph\def\BibEmph#1{\emph{#1}}\else\fi
+
+\bibitem{bib1}
+\selectlanguageifdefined{english}
+\BibEmph{Майкл,~Доусон}. Python Programming for the Absolute
+  Beginner, 3rd Edition~/ Доусон~Майкл. ---
+\newblock Прогресс книга, 2019. ---
+\newblock P.~416.
+
+\bibitem{bib2}
+\selectlanguageifdefined{english}
+Visual Studio Code. ---
+\newblock Microsoft, 2005. \BibUrl{ https://code.visualstudio.com/}.
+
+\bibitem{bib3}
+\selectlanguageifdefined{english}
+Windows. ---
+\newblock Microsoft, 1985. \BibUrl{ https://www.microsoft.com/ru-ru/windows}.
+
+\bibitem{bib4}
+\selectlanguageifdefined{english}
+Linux. ---
+\newblock 1991. \BibUrl{ https://www.linux.org.ru/}.
+
+\bibitem{bib5}
+\selectlanguageifdefined{english}
+Ubuntu 18.04. ---
+\newblock 2018. \BibUrl{ https://releases.ubuntu.com/18.04/}.
+
+\bibitem{bib7}
+\selectlanguageifdefined{english}
+process time function in Python. \BibUrl{
+  https://www.geeksforgeeks.org/time-process_time-function-in-python/}.
+
+\bibitem{bib6}
+\selectlanguageifdefined{english}
+Замер памяти в Python3. ---
+\newblock 2019. \BibUrl{ https://pypi.org/project/memory- profiler/}.
+
+\end{thebibliography}

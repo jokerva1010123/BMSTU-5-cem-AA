@@ -1,0 +1,563 @@
+\documentclass[12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+%\usepackage[14pt]{extsizes}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools} 
+\usepackage{pgfplots}
+\usepackage{filecontents}
+\usepackage{indentfirst}
+\usepackage{eucal}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\frenchspacing
+
+\usepackage{indentfirst} % Красная строка
+
+
+%\usetikzlibrary{datavisualization}
+%\usetikzlibrary{datavisualization.formats.functions}
+
+\usepackage{amsmath}
+
+
+
+
+% Для листинга кода:
+\lstset{ %
+language=haskell,                 % выбор языка для подсветки (здесь это С)
+basicstyle=\small\sffamily, % размер и начертание шрифта для подсветки кода
+numbers=left,               % где поставить нумерацию строк (слева\справа)
+numberstyle=\tiny,           % размер шрифта для номеров строк
+stepnumber=1,                   % размер шага между двумя номерами строк
+numbersep=5pt,                % как далеко отстоят номера строк от подсвечиваемого кода
+showspaces=false,            % показывать или нет пробелы специальными отступами
+showstringspaces=false,      % показывать или нет пробелы в строках
+showtabs=false,             % показывать или нет табуляцию в строках
+frame=single,              % рисовать рамку вокруг кода
+tabsize=2,                 % размер табуляции по умолчанию равен 2 пробелам
+captionpos=t,              % позиция заголовка вверху [t] или внизу [b] 
+breaklines=true,           % автоматически переносить строки (да\нет)
+breakatwhitespace=false, % переносить строки только если есть пробел
+escapeinside={\#*}{*)}   % если нужно добавить комментарии в коде
+}
+
+\usepackage[left=2cm,right=2cm, top=2cm,bottom=2cm,bindingoffset=0cm]{geometry}
+% Для измененных титулов глав:
+\usepackage{titlesec, blindtext, color} % подключаем нужные пакеты
+\definecolor{gray75}{gray}{0.75} % определяем цвет
+\newcommand{\hsp}{\hspace{20pt}} % длина линии в 20pt
+% titleformat определяет стиль
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+
+
+% plot
+\usepackage{pgfplots}
+\usepackage{filecontents}
+\usetikzlibrary{datavisualization}
+\usetikzlibrary{datavisualization.formats.functions}
+
+\begin{document}
+%\def\chaptername{} % убирает "Глава"
+\thispagestyle{empty}
+\begin{titlepage}
+	\noindent \begin{minipage}{0.15\textwidth}
+	\includegraphics[width=\linewidth]{b_logo}
+	\end{minipage}
+	\noindent\begin{minipage}{0.9\textwidth}\centering
+		\textbf{Министерство науки и высшего образования Российской Федерации}\\
+		\textbf{Федеральное государственное бюджетное образовательное учреждение высшего образования}\\
+		\textbf{~~~«Московский государственный технический университет имени Н.Э.~Баумана}\\
+		\textbf{(национальный исследовательский университет)»}\\
+		\textbf{(МГТУ им. Н.Э.~Баумана)}
+	\end{minipage}
+	
+	\noindent\rule{18cm}{3pt}
+	\newline\newline
+	\noindent ФАКУЛЬТЕТ $\underline{\text{«Информатика и системы управления»}}$ \newline\newline
+	\noindent КАФЕДРА $\underline{\text{«Программное обеспечение ЭВМ и информационные технологии»}}$\newline\newline\newline\newline\newline
+	
+	
+	\begin{center}
+		\noindent\begin{minipage}{1.3\textwidth}\centering
+			\Large\textbf{  Отчёт по лабораторной работе №4}\newline
+			\textbf{по дисциплине "Анализ алгоритмов"}\newline\newline
+		\end{minipage}
+	\end{center}
+	
+	\noindent\textbf{Тема} $\underline{\text{Параллельное умножение матриц}}$\newline\newline
+	\noindent\textbf{Студент} $\underline{\text{Романов А.В.}}$\newline\newline
+	\noindent\textbf{Группа} $\underline{\text{ИУ7-53Б}}$\newline\newline
+	\noindent\textbf{Оценка (баллы)} $\underline{\text{~~~~~~~~~~~~~~~~~~~~~~~~~~~}}$\newline\newline
+	\noindent\textbf{Преподаватели} $\underline{\text{Волкова Л.Л., Строганов Ю.В.}}$\newline\newline\newline
+	
+	\begin{center}
+		\vfill
+		Москва~---~\the\year
+		~г.
+	\end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+\tableofcontents
+
+\newpage
+\chapter*{Введение}
+\addcontentsline{toc}{chapter}{Введение}
+
+Многопоточность — способность центрального процессора (CPU) или одного ядра в многоядерном процессоре одновременно выполнять несколько процессов или потоков, соответствующим образом поддерживаемых операционной системой.
+
+Этот подход отличается от многопроцессорности, так как многопоточность процессов и потоков совместно использует ресурсы одного или нескольких ядер: вычислительных блоков, кэш-памяти ЦПУ или буфера перевода с преобразованием (TLB).
+
+
+В тех случаях, когда многопроцессорные системы включают в себя несколько полных блоков обработки, многопоточность направлена на максимизацию использования ресурсов одного ядра, используя параллелизм на уровне потоков, а также на уровне инструкций.
+
+Поскольку эти два метода являются взаимодополняющими, их иногда объединяют в системах с несколькими многопоточными ЦП и в ЦП с несколькими многопоточными ядрами.
+
+
+Многопоточная парадигма стала более популярной с конца 1990-х годов, поскольку усилия по дальнейшему использованию параллелизма на уровне инструкций застопорились.
+
+Смысл многопоточности — квазимногозадачность на уровне одного исполняемого процесса.
+
+Значит, все потоки процесса помимо общего адресного пространства имеют и общие дескрипторы файлов. Выполняющийся процесс имеет как минимум один (главный) поток.
+
+
+Многопоточность (как доктрину программирования) не следует путать ни с многозадачностью, ни с многопроцессорностью, несмотря на то, что операционные системы, реализующие многозадачность, как правило, реализуют и многопоточность.
+
+
+Достоинства:
+
+\begin{itemize}
+
+	\item облегчение программы посредством использования общего адресного пространства;
+
+	\item меньшие затраты на создание потока в сравнении с процессами;
+
+	\item повышение производительности процесса за счёт распараллеливания процессорных вычислений;
+
+	\item если поток часто теряет кэш, другие потоки могут продолжать использовать неиспользованные вычислительные ресурсы.
+
+\end{itemize}
+
+
+Недостатки:
+
+\begin{itemize}
+
+	\item несколько потоков могут вмешиваться друг в друга при совместном использовании аппаратных ресурсов \cite{Nemirovsky};
+
+	\item с программной точки зрения аппаратная поддержка многопоточности более трудоемка для программного обеспечения \cite{Olukotun};
+
+	\item проблема планирования потоков;
+
+	\item специфика использования. Вручную настроенные программы на ассемблере, использующие расширения MMX или AltiVec и выполняющие предварительные выборки данных, не страдают от потерь кэша или неиспользуемых вычислительных ресурсов. Таким образом, такие программы не выигрывают от аппаратной многопоточности и действительно могут видеть ухудшенную производительность из-за конкуренции за общие ресурсы.
+
+\end{itemize}
+
+Однако несмотря на количество недостатков, перечисленных выше, многопоточная парадигма имеет большой потенциал на сегодняшний день и при должном написании кода позволяет значительно ускорить однопоточные алгоритмы.
+
+\section*{Цель лабораторной работы}
+Целью данной лабораторной работы является изучение и реализация параллельных вычислений.
+
+\section*{Задачи лабораторной работы}
+\indent В рамках выполнения работы необходимо решить следующие задачи:
+
+\begin{itemize}
+
+	\item изучить понятие параллельных вычислений;
+
+	\item реализовать последовательный и 2 параллельных реализаций алгоритма перемножения матриц;
+
+	\item сравнить временные характеристики реализованных алгоритмов экспериментально.
+\end{itemize}
+
+\chapter{Аналитическая часть}
+
+\section{Описание задачи}
+
+
+Пусть даны две прямоугольные матрицы
+\begin{equation}
+A_{lm} = \begin{pmatrix}
+a_{11} & a_{12} & \ldots & a_{1m}\\
+a_{21} & a_{22} & \ldots & a_{2m}\\
+\vdots & \vdots & \ddots & \vdots\\
+a_{l1} & a_{l2} & \ldots & a_{lm}
+\end{pmatrix},
+\quad
+B_{mn} = \begin{pmatrix}
+b_{11} & b_{12} & \ldots & b_{1n}\\
+b_{21} & b_{22} & \ldots & b_{2n}\\
+\vdots & \vdots & \ddots & \vdots\\
+b_{m1} & b_{m2} & \ldots & b_{mn}
+\end{pmatrix},
+\end{equation}
+
+тогда матрица $C$
+\begin{equation}
+C_{ln} = \begin{pmatrix}
+c_{11} & c_{12} & \ldots & c_{1n}\\
+c_{21} & c_{22} & \ldots & c_{2n}\\
+\vdots & \vdots & \ddots & \vdots\\
+c_{l1} & c_{l2} & \ldots & c_{ln}
+\end{pmatrix},
+\end{equation}
+
+где
+\begin{equation}
+\label{eq:M}
+c_{ij} =
+\sum_{r=1}^{m} a_{ir}b_{rj} \quad (i=\overline{1,l}; j=\overline{1,n})
+\end{equation}
+
+будет называться произведением матриц $A$ и $B$.
+
+
+В данной лабораторной работе стоит задача распараллеливания алгоритма Винограда по 2 схемам. Так как каждый элемент матрицы $C$ вычисляется независимо от других и матрицы $A$ и $B$ не изменяются, то для параллельного вычисления произведения, достаточно просто равным образом распределить элементы матрицы $C$ между потоками.
+
+
+
+\section{Вывод}
+	Обычный алгоритм перемножения матриц независимо вычисляет элементы матрицы-результата, что дает большое количество возможностей для реализации параллельного варианта алгоритма.
+\clearpage
+
+\chapter{Конструкторская часть}
+
+На рисунке 2.1 представлена схема обычного алгоритма перемножения матриц (без распараллеливания). На рисунках 2.2 и 2.3 представлены схемы первого и второго варианта распараллеливания алгоритма умножения матриц. На риснуке 2.4 показана схема функции, определяющая границы циклов для каждого из потоков.
+
+\section{Схемы алгоритмов}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.85]{base.jpg}
+	\caption{Схема стандартного алгоритма умножения матриц.}
+	\label{fig:mpr}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.85]{parallel1.jpg}
+	\caption{Схема распараллеленного алгоритма умножения матриц, способ №1.}
+	\label{fig:mpr}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.85]{parallel2.jpg}
+	\caption{Схема распараллеленного алгоритма умножения матриц, способ №2.}
+	\label{fig:mpr}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=1]{start_threading.jpg}
+	\caption{Функция создания потоков и запуска параллельных реализация умножения матриц}
+	\label{fig:mpr}
+\end{figure}
+
+На рисунке 2.5 представленна схема с параллельным выполнением первого цикла (по строкам матрицы), а на рисунке 2.6 -- с параллельным выполнением второго цикла (по столбам матрицы.)
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.7]{parallel_scheme_01.jpg}
+	\caption{Схема с параллельным выполнением первого цикла}
+	\label{fig:mpr}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.7]{parallel_scheme_02.jpg}
+	\caption{Схема с параллельным выполнением второго цикла}
+	\label{fig:mpr}
+\end{figure}
+
+
+
+\section{Вывод}
+На основе теоретических данных, полученных из аналитического раздела, была построена схема стандартного алгоритма умножения матриц, а так же после разделения алгоритма на этапы были предложены 2 схемы параллельного выполнения данных этапов.
+
+\chapter{Технологическая часть}
+
+В данном разделе приведены средства реализации и листинги кода.
+
+\section{Требование к ПО}
+
+К программе предъявляется ряд требований:
+
+\begin{itemize}
+	\item на вход подаются размеры 2 матриц, а также их элементы;
+	\item на выходе — матрица, которая является результатом умножения входных матриц.
+\end{itemize}
+
+\section{Средства реализации}
+Для реализации ПО я выбрал язык программирования Си \cite{C}. Данный выбор обусловлен высокой скоростью работы языка, а так же наличия инструментов для создания и эффективной работы с потоками.
+
+\section{Реализация алгоритмов}
+
+В листингах 3.1 - 3.3 приведена реализация расмотренных ранее алгоритмов перемножения матриц.
+В листинге 3.4 приведена реализация функции создания и распределения потоков.
+
+\begin{lstlisting}[label=some-code,caption=Функция умножения матриц обычным способом, language=C]
+void base_multiplication(args_t *args) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < K; j++) {
+			args->res[i][j] = 0;
+			for (int k = 0; k < M; k++) {
+				args->res[i][j] += args->m1[i][k] * args->m2[k][j];
+			}
+		}
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Функция умножения матриц параллельно. Способ №1,language=C]
+void *parallel_multiplication1(void *args) {
+	pthread_args_t *argsp = (args_t *)args;
+
+	int row_start = argsp->tid * (argsp->size / argsp->cnt_threads);
+	int row_end = (argsp->tid + 1) * (argsp->size / argsp->cnt_threads);
+
+	for (int i = row_start; i < row_end; i++) {
+		for (int j = 0; j < K; j++) {
+			argsp->mult_args->res[i][j] = 0;
+			for (int k = 0; k < M; k++) {
+				argsp->mult_args->res[i][j] += argsp->mult_args->m1[i][k] * argsp->mult_args->m2[k][j];
+			}
+		}
+	}
+
+	return NULL;
+}
+
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Функция умножения матриц параллельно. Способ №2,language=C]
+void *parallel_multiplication2(void *args) {
+	pthread_args_t *argsp = (args_t *)args;
+
+	int col_start = argsp->tid * (argsp->size / argsp->cnt_threads);
+	int col_end = (argsp->tid + 1) * (argsp->size / argsp->cnt_threads);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = col_start; j < col_end; j++) {
+			argsp->mult_args->res[i][j] = 0;
+			for (int k = 0; k < M; k++) {
+				argsp->mult_args->res[i][j] += argsp->mult_args->m1[i][k] * argsp->mult_args->m2[k][j];
+			}
+		}
+	}
+
+	return NULL;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Функция создания потоков,language=C]
+int start_threading(args_t *args, const int cnt_threads, const int type) {
+
+	pthread_t *threads = malloc(cnt_threads * sizeof(pthread_t));
+
+	if (!threads) {
+		return ALLOCATE_ERROR;
+	}
+
+
+	pthread_args_t *args_array = malloc(sizeof(pthread_args_t) * cnt_threads);
+
+	if (!args_array) {
+		free(threads);
+		return ALLOCATE_ERROR;
+	}
+
+	for (int i = 0; i < cnt_threads; i++) {
+		args_array[i].mult_args = args;
+		args_array[i].tid = i;
+		args_array[i].size = N;
+		args_array[i].cnt_threads = cnt_threads;
+
+		if (type == 1) {
+			pthread_create(&threads[i], NULL, parallel_multiplication1, &args_array[i]);
+		} else {
+			pthread_create(&threads[i], NULL, parallel_multiplication2, &args_array[i]);
+		}
+	}
+
+	for (int i = 0; i < cnt_threads; i++) {
+		pthread_join(threads[i], NULL);
+	}
+
+	free(args_array);
+	free(threads);
+
+	return OK;
+}
+
+\end{lstlisting}
+
+\section{Тестовые данные}
+
+В таблице~\ref{tabular:test_rec} приведены тесты для функций, реализующих параллельное и обычное умножение матриц. Все тесты пройдены успешно.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}}
+			\hline
+			Первая матрица & Вторая матрица & Ожидаемый результат \\ \hline
+			\vspace{4mm}
+			$\begin{pmatrix}
+			1 & 2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			1 & 2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			6 & 12 & 18\\
+			6 & 12 & 18\\
+			6 & 12 & 18
+			\end{pmatrix}$ \\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			1 & 2 & 2\\
+			1 & 2 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			1 & 2\\
+			1 & 2\\
+			1 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			5 & 10\\
+			5 & 10
+			\end{pmatrix}$ \\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			4
+			\end{pmatrix}$ \\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			1 & -2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			-1 & 2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			0 & 4 & 6\\
+			4 & 12 & 18\\
+			4 & 12 & 18
+			\end{pmatrix}$\\
+			\vspace{2mm}
+			\vspace{2mm}
+		\end{tabular}
+	\end{center}
+	\caption{\label{tabular:test_rec} Тестирование функций}
+\end{table}
+
+\section{Вывод}
+
+В данном разделе были разработаны исходные коды алгоритмов: обычный способ умножения матриц и два способа параллельного перемножения матриц.
+
+\chapter{Исследовательская часть}
+
+\section{Технические характеристики}
+
+Ниже приведены технические характеристики устройства, на котором было проведено тестирование ПО:
+
+\begin{itemize}
+	\item Операционная система: Debian \cite{debian} Linux \cite{linux} 11 <<bullseye>> 64-bit.
+	\item Оперативная память: 12 GB.
+	\item Процессор: Intel(R) Core(TM) i5-3550 CPU @ 3.30GHz
+\cite{i5}.
+
+\end{itemize}
+
+\section{Время выполнения алгоритмов}
+В таблице 4.1 приведено сравнение двух реализаций параллельного умножения матриц с разным количеством потоков при перемножении матриц размером 512. В таблице 4.2 приведено сравнение однопоточной реализации и многопоточных (с предварительным транспонированием и без) (на четырёх потоках).
+
+\begin{table} [h!]
+	\caption{Таблица времени выполнения параллельных алгоритмов, при размерах перемножаемых матриц 512 (в тиках)}
+	\begin{center}
+		\begin{tabular}{|c c c c c|} 
+			\hline
+			Количество потоков & П1 & П2 & ТП1 & ТП2 \\  
+			\hline
+			1 & 2 808 685 166 & 2 811 309 156 & 2 505 297 765 & 2 543 312 143\\
+			\hline
+			2 & 1 418 843 814 & 1 420 505 354 & 1 390 440 763 & 1 327 401 234\\
+			\hline
+			4 & 754 354 852 & 749 388 813 & 735 231 324 & 731 238 763 \\
+			\hline
+			8 & 761 861 636 & 753 869 394 & 744 110 083 & 743 132 552 \\
+			\hline
+			16 & 756 535 197 & 755 651 844 & 751 231 324 & 745 231 233 \\
+			\hline
+			32 & 777 543 386 & 766 654 800 & 759 231 323 & 751 231 973 \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table} [h!]
+	\caption{Таблица времени выполнения простого и параллельных алгоритмов (на 4 потоках) перемножения матриц (в тиках)}
+	\begin{center}
+		\begin{tabular}{|c c c c c c|} 
+			\hline
+			Размер матрицы & Обычный & П1 & П2 & ТП1 & ТП2\\  
+			\hline
+			64 & 11 569 478 & 4 423 500 & 4 399 005 & 3 774 315 & 3 880 419 \\
+			\hline
+			128 & 59 224 135 & 16 626 572 & 17 706 987 & 14 993 123 & 14 709 974 \\
+			\hline
+			256 & 354 152 337 & 98 670 198 & 93 640 191 & 91 623 197 & 94 227 134 \\
+			\hline
+			512 & 2 719 059 760 & 755 595 299 & 751 307 775 & 710 340 123 & 705 231 \\
+			\hline
+			1024 & 26 717 252 997 & 7 347 757 065 & 7 489 450 509 & 6 821 345 197 & 6 576 277 123 \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section{Вывод}
+
+Наилучшее время параллельные алгоритмы показали на 4 потоках, что соответствует количеству логических ядер компьютера, на котором проводилось тестирование. На матрицах размером 512 на 512, параллельные алгоритмы улучшают время обычной (однопоточной) реализации перемножения матриц примерно в 3.5 раза. При количестве потоков, большее чем 4, параллельная реализация замедляет выполнение (в сравнении с 4 потоками). Кроме этого, я решил добавить в сравнение параллельное умножение с предварительным транспонированием: данный способ перемножения оказался самым эффективным (в среднем на 15\% быстрее обычного параллельного умножения). Это можно объяснить кэшированием элементов.
+
+\chapter*{Заключение}
+\addcontentsline{toc}{chapter}{Заключение}
+
+В рамках данной лабораторной работы была достигнута её цель: изучены паралелльные вычисления. Также выполнены следующие задачи:
+
+\begin{itemize}
+	\item было изучено понятие параллельных вычислений;
+	\item были реализованы обычный и  2 параллельных реализаций алгоритма перемножения матриц;
+	\item было произведено сравнение временных характеристик реализованных алгоритмов экспериментально.
+\end{itemize}
+
+Параллельные реализации алгоритмов выигрывают по скорости у обычной (однопоточной) реализации перемножения двух матриц. Наиболее эффективны данные алгоритмы при количестве потоков, совпадающем с количеством логических ядер компьютера. Так, например, на матрицах размером 512 на 512, удалось улучшить время выполнения алгоритма умножения матриц в 3.6 раза (в сравнении с однопоточной реализацией). Так же стоит отметить, что при дополнительном транспонировании второй матрицы, можно уменьшить время выполнения параллельных алгоритмов в среднем на 15\%, что объясняется кэшированием элементов.
+
+\addcontentsline{toc}{chapter}{Литература}
+
+\bibliographystyle{utf8gost705u}  % стилевой файл для оформления по ГОСТу
+
+\bibliography{51-biblio}          % имя библиографической базы (bib-файла)
+
+
+\end{document}

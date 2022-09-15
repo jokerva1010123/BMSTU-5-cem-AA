@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/viktoriamhitaran/Desktop/АА/Lab08/BM.h
+limits.h
+-
+string.h
+-
+stdio.h
+-
+
+/Users/viktoriamhitaran/Desktop/АА/Lab08/KMP.h
+string
+-
+vector
+-
+
+/Users/viktoriamhitaran/Desktop/АА/Lab08/main.cpp
+iostream
+-
+KMP.h
+/Users/viktoriamhitaran/Desktop/АА/Lab08/KMP.h
+BM.h
+/Users/viktoriamhitaran/Desktop/АА/Lab08/BM.h
+

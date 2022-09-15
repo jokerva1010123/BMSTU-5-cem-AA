@@ -1,0 +1,155 @@
+\chapter{ Технологический раздел}
+\label{cha:design}
+
+\section{Выбор ЯП}
+
+В данной лабораторной работе использовался язык программирования - python \cite{bib1}.
+Я знакома с данным языком.
+Поэтому он был выбран. 
+В качестве среды разработки я использовала Visual Studio Code \cite{bib2}, т.к. считаю его достаточно удобным и легким.
+Visual Studio Code подходит не только для  Windows \cite{bib3}, но и для Linux \cite{bib4}, это еще одна причина, по которой я выбрала VS code, т.к. у меня установлена ОС Ubuntu 18.04.4 \cite{bib5}.
+
+\section{Требования к программному обеспечению}
+
+Входными данными являются:
+
+
+\begin{enumerate}
+    \item размерность массива n;
+    \item n элементов массива.
+\end{enumerate}
+
+На выходе получается отсортированный массив.
+
+\section{Сведения о модулях программы}
+
+Данная программа разбита на модули:
+
+\begin{itemize}
+    \item main.py - Файл, содержащий точку входа в программу. В нем происходит общение с пользователем и вызов алгоритмов;
+    \item sort.py - Файл, содержащий алгоритмы сортировок.
+    \item arr.py - файл, содержащие методы для работы с массивом.
+\end{itemize}
+
+На листингах 3.1-3.5 представлен код программы.
+
+\begin{lstlisting}[label=some-code,caption=Главная функция main]
+def main():
+	arr = inputArr()
+
+	output("Введенный массив:", GREEN)
+	outputArr(arr)
+
+	arr_bubble = sort_bubble(arr)
+
+	output("Отсортированный массив (Пузырек):", GREEN)
+	outputArr(arr_bubble)
+
+	arr_insert = sort_insert(arr)
+	output("Отсортированный массив (Вставками):", GREEN)
+	outputArr(arr_insert)
+
+	arr_quick = quick_sort(arr)
+	output("Отсортированный массив (Quick sort):", GREEN)
+	outputArr(arr_quick)
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Сортировка пузырьком]
+	def sort_bubble(arr):
+    n = len(arr) - 1
+
+    for i in range(n):
+        for j in range(n - i):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j] 
+
+    return arr
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=Сортировка вставками]
+def sort_insert(arr):
+    n = len(arr)
+
+    for i in range(1, n):
+        temp = arr[i]
+        j = i
+        while j > 0 and arr[j - 1] > temp:
+            arr[j] = arr[j - 1]
+            j -= 1
+        arr[j] = temp
+
+    return arr
+\end{lstlisting}
+
+\begin{lstlisting}[label=some-code,caption=QuickSort]
+def sort_quick_recursion(arr, begin, end):
+    if begin < end:
+        # Опорная точка. pivot.
+        p = begin
+        for i in range(begin + 1, end):
+            if arr[i] < arr[begin]:
+                p += 1
+                arr[p], arr[i] = arr[i], arr[p]
+        arr[begin], arr[p] = arr[p], arr[begin] 
+        
+        sort_quick_recursion(arr,  begin, p)
+        sort_quick_recursion(arr, p + 1, end)
+
+	return arr
+	
+def quick_sort(arr):
+    return sort_quick_recursion(arr, 0, len(arr) - 1)
+\end{lstlisting}
+
+
+\begin{lstlisting}[label=some-code,caption=Методы для работы с массивом]
+def inputArr():
+    n = int(input("Введите n: "))
+    arr = list()
+
+    if (not n):
+        return
+    for _ in range(n):
+        arr.append(int(input("Введите элемент: ")))
+
+    return arr
+
+
+def outputArr(arr):
+    for i in range(len(arr)):
+        print(arr[i], end=" ")
+    print()
+\end{lstlisting}
+
+
+\section{Тестирование}
+
+
+В данном разделе будет приведена таблица с тестами (таблица \ref{table:ref1}).
+
+\begin{table}[ht]
+    \centering
+    \caption{Таблица тестов}
+    \label{table:ref1}
+    \begin{tabular}{ | l | l | l |}
+        \hline
+        Массив    & Результат & Результат    \\ \hline
+        5 4 3 2 1 & 1 2 3 4 5 & Ответ верный \\ \hline
+        1 2 3 4 5 & 1 2 3 4 5 & Ответ верный \\ \hline
+        1 -1 2 0  & -1 0 1 2  & Ответ верный \\ \hline
+        1 -1 2 0  & -1 0 1 2  & Ответ верный \\ \hline
+        -1 -2 -3  & -3 -2 -1  & Ответ верный \\ \hline
+        1 1 1 1   & 1 1 1 1   & Ответ верный \\ \hline
+        0         & 0         & Ответ верный \\ \hline
+                  &           & Ответ верный \\ \hline
+        \hline
+    \end{tabular}
+\end{table}
+
+Все тесты пройдены.
+
+\section{Вывод}
+
+В данном разделе был выбран и обоснован язык программирования.
+Были разобраны листинги 3.1-3.5 с кодом программы.
+А также приведены тесты (таблица \ref{table:ref1}).
