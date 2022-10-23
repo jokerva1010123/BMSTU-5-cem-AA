@@ -1,0 +1,202 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут рассмотрены средства реализации, а также представлены листинги алгоритмов определения расстояния Левенштейна и Дамерау-Левенштейна.
+
+\section{Средства реализации}
+В данной работе для реализации был выбран язык программирования $Python$. В текущей лабораторной работе требуется замерить процессорное время работы выполняемой программы
+и визуализировать результаты при помощи графиков. Инструменты для этого присутствуют в выбранном языке программирования.
+
+Время работы было замерено с помощью функции \textit{process\_time(...)} из библиотеки $time$.
+
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{lst:lev_mat}-\ref{lst:dam_lev_rec_cache} представлена реализация алгоритмов нахождения расстояния Левенштейна и Дамерау-Левенштейна.
+
+\clearpage
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:lev_mat,caption=Алгоритм нахождения расстояния Левенштейна (матричный)]
+def levenshteinDistance(str1, str2, output = True):
+	n = len(str1)
+	m = len(str2)
+	matrix = createLevenshteinMatrix(n + 1, m + 1)
+	
+	for i in range(1, n + 1):
+		for j in range(1, m + 1):
+		add = matrix[i - 1][j] + 1
+		delete = matrix[i][j - 1] + 1
+		change = matrix[i - 1][j - 1]
+		
+		if (str1[i - 1] != str2[j - 1]):
+			change += 1
+		
+		matrix[i][j] = min(add, delete, change)
+	
+	if (output):
+		printMatrix(matrix, str1, str2)
+	
+	return matrix[n][m]
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:dam_lev_mat,caption=Алгоритм нахождения расстояния Дамерау-Левенштейна (матричный)]
+def damerauLevenshteinDistance(str1, str2, output = True):
+	n = len(str1)
+	m = len(str2)
+	matrix = createLevenshteinMatrix(n + 1, m + 1)
+	
+	for i in range(1, n + 1):
+		for j in range(1, m + 1):
+			add = matrix[i - 1][j] + 1
+			delete = matrix[i][j - 1] + 1
+			change = matrix[i - 1][j - 1]
+			if (str1[i - 1] != str2[j - 1]):
+				change += 1
+			swap = n
+			if (i > 1 and j > 1 and
+				str1[i - 1] == str2[i - 2] and
+				str1[i - 2] == str2[i - 1]):
+					swap = matrix[i - 2][j - 2] + 1
+		
+		matrix[i][j] = min(add, delete, change, swap)
+	
+	if (output):
+		printMatrix(matrix, str1, str2)
+	
+	return matrix[n][m]
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:dam_lev_rec,caption=Алгоритм нахождения расстояния Дамерау-Левенштейна (рекурсивный)]
+def damerauLevenshteinDistanceRecursive(str1, str2, output = True):
+	n = len(str1)
+	m = len(str2)
+	flag = 0
+	if ((n == 0) or (m == 0)):
+	return abs(n - m)
+	
+	if (str1[-1] != str2[-1]):
+	flag = 1
+	
+	minDistance = min(
+		damerauLevenshteinDistanceRecursive(str1[:-1], str2) + 1,
+		damerauLevenshteinDistanceRecursive(str1, str2[:-1]) + 1,
+		damerauLevenshteinDistanceRecursive(str1[:-1], str2[:-1]) + flag
+	)
+	if (n > 1 and m > 1 and str1[-1] == str2[-2] and str1[-2] == str2[-1]):
+		minDistance = min(
+			minDistance,
+			damerauLevenshteinDistanceRecursive(str1[:-2], str2[:-2]) + 1
+	)
+	
+	return minDistance
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:dam_lev_rec_cache,caption=Алгоритм нахождения расстояния Дамерау-Левенштейна (рекурсивный с использованием кеша)]
+def recursiveWithCache(str1, str2, n, m, matrix):
+	if (matrix[n][m] != -1):
+		return matrix[n][m]
+	if (n == 0):
+		matrix[n][m] = m
+		return matrix[n][m]
+	if ((n > 0) and (m == 0)):
+		matrix[n][m] = n
+		return matrix[n][m]
+	
+	add = recursiveWithCache(str1, str2, n - 1, m, matrix) + 1
+	delete = recursiveWithCache(str1, str2, n, m - 1, matrix) + 1
+	change = recursiveWithCache(str1, str2, n - 1, m - 1, matrix)
+	if (str1[n - 1] != str2[m - 1]):
+		change += 1 # flag
+	
+	matrix[n][m] = min(add, delete, change)
+	if (n > 1 and m > 1 and
+		str1[n - 1] == str2[m - 2] and
+		str1[n - 2] == str2[m - 1]):
+	
+			matrix[n][m] = min(
+			matrix[n][m],
+			recursiveWithCache(str1, str2, n - 2, m - 2, matrix) + 1
+			)
+	
+	return matrix[n][m]
+
+def damerauLevenshteinDistanceRecurciveCache(str1, str2, output = True):
+	n = len(str1)
+	m = len(str2)
+	matrix = createLevenshteinMatrix(n + 1, m + 1)
+	
+	for i in range(n + 1):
+		for j in range(m + 1):
+			matrix[i][j] = -1
+		
+	recursiveWithCache(str1, str2, n, m, matrix)
+	
+	if (output):
+		printMatrix(matrix, str1, str2)
+	
+	return matrix[n][m]
+
+\end{lstlisting}
+\end{center}
+
+\section{Функциональные тесты}
+
+В таблице \ref{tbl:functional_test} приведены тесты для функций, реализующих алгоритмы нахождения расстояния Левенштейна и Дамерау-Левенштейна. Тесты \textit{для всех алгоритмов} пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:functional_test} Функциональные тесты}
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			& & & \multicolumn{2}{c|}{Ожидаемый результат} \\
+			\hline
+			№&Строка 1&Строка 2&Левенштейн&Дамерау-Л. \\
+			\hline
+            1&"пустая строка"&"пустая строка"&0&0 \\
+            \hline
+            2&"пустая строка"&слово&5&5 \\
+            \hline
+            3&проверка&"пустая строка"&8&8 \\
+            \hline
+            4&ремонт&емонт&1&1 \\
+			\hline
+			5&гигиена&иена&3&3 \\
+			\hline
+            6&нисан&автоваз&6&6 \\
+			\hline
+			7&спасибо&пожалуйста&9&9 \\
+			\hline
+            8&что&кто&1&1 \\
+			\hline
+            9&ты&тыква&3&3 \\
+			\hline
+            10&есть&кушать&4&4 \\
+			\hline
+			11&abba&baab&3&2 \\
+			\hline
+            12&abcba&bacab&4&2 \\
+			\hline
+		\end{tabular}
+        \end{threeparttable}
+	\end{center}
+\end{table}
+
+\section{Вывод}
+
+В данном разделе были выбраны средства  разработки алгоритмов.
+Также была представлена реализация всех алгоритмов нахождения расстояний Левенштейна и Дамерау-Левенштейна, которые были описаны в предыдущем разделе.

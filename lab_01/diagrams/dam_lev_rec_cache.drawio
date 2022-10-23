@@ -1,0 +1,131 @@
+<mxfile host="65bd71144e">
+    <diagram id="e8HcKjrJ19RcabzqBKkU" name="Страница 1">
+        <mxGraphModel dx="1630" dy="1016" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=30;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="3" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Начало" style="html=1;dashed=0;whitespace=wrap;shape=mxgraph.dfd.start" parent="1" vertex="1">
+                    <mxGeometry x="600" y="110" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="5" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="n = длина (s1)&lt;br&gt;m = длина (s2)" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="210" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;dashed=1;" parent="1" source="7" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;div&gt;&lt;span&gt;Алгоритм поиска расстояниея&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;Дамерау-Левенштейна с кэшем (s1[1..n], s2[1..m])&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;(далее - ДЛ_к (s1[1..n], s2[1..m]))&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Вход: строки s1, s2&lt;/div&gt;&lt;div&gt;Выход: число - расстояние Дамерау-Левенштейна&lt;/div&gt;" style="html=1;dashed=0;whitespace=wrap;shape=partialRectangle;right=0;align=left;" parent="1" vertex="1">
+                    <mxGeometry x="870" y="90" width="30" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" parent="1" source="10" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" parent="1" source="10" target="16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="n == 0&lt;br&gt;или&lt;br&gt;m == 0" style="shape=rhombus;html=1;dashed=0;whitespace=wrap;perimeter=rhombusPerimeter;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="310" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;endArrow=classic;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="12" target="23" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="500" y="600" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="900" y="620"/>
+                            <mxPoint x="700" y="620"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="12" value="Вернуть |n - m|" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="800" y="380" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Да" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="795" y="310" width="30" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" parent="1" source="16" target="20" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" parent="1" source="16" target="18" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="s1[n - 1] == s2[m - 1]" style="shape=rhombus;html=1;dashed=0;whitespace=wrap;perimeter=rhombusPerimeter;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="380" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" parent="1" source="18" target="23" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="700" y="580"/>
+                            <mxPoint x="500" y="580"/>
+                            <mxPoint x="500" y="620"/>
+                            <mxPoint x="700" y="620"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="flag = 0" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="480" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;endArrow=none;endFill=0;" parent="1" source="20" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="500" y="580" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="300" y="580"/>
+                            <mxPoint x="500" y="580"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" value="flag = 1" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="480" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Да" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="380" width="30" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="minDistance = min(&lt;br&gt;&lt;span style=&quot;text-align: left&quot;&gt;ДЛ_к&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;&amp;nbsp;(s1[1..n] - 1, s2[1..m]) + 1,&lt;br&gt;&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;ДЛ_к&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;&amp;nbsp;(s1[1..n], s2[1..m - 1]) + 1,&lt;br&gt;&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;ДЛ_к&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;&amp;nbsp;(s1[1..n] - 1, s2[1..m] - 1) +&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;flag&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;)&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;&lt;br&gt;&lt;/span&gt;" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="595" y="670" width="210" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Конец" style="html=1;dashed=0;whitespace=wrap;shape=mxgraph.dfd.start" parent="1" vertex="1">
+                    <mxGeometry x="600" y="1050" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;rounded=0;" parent="1" source="25" target="26" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="910" y="790"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="30" style="edgeStyle=none;rounded=0;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="25" target="27" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="490" y="790"/>
+                            <mxPoint x="490" y="930"/>
+                            <mxPoint x="700" y="930"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="25" value="n &amp;gt; 1 &amp;amp;&amp;amp; m &amp;gt; 1 &amp;amp;&amp;amp;&lt;br&gt;s1[n - 1] = s2[m - 2] &amp;amp;&amp;amp;&lt;br&gt;s1[n - 2] = s2[m - 1]" style="shape=rhombus;html=1;dashed=0;whitespace=wrap;perimeter=rhombusPerimeter;" parent="1" vertex="1">
+                    <mxGeometry x="585" y="750" width="230" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" style="edgeStyle=none;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="26" target="27" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="910" y="930"/>
+                            <mxPoint x="700" y="930"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="26" value="minDistance = min(minDistance,&lt;br&gt;&lt;span style=&quot;text-align: left&quot;&gt;ДЛ_к (s1[1..n - 2], s2[1..m - 2]) + 1)&lt;/span&gt;&lt;span style=&quot;text-align: left&quot;&gt;&lt;br&gt;&lt;/span&gt;" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="805" y="840" width="210" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" style="edgeStyle=none;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0.5;entryDx=0;entryDy=-30;entryPerimeter=0;" parent="1" source="27" target="24" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;span style=&quot;text-align: left&quot;&gt;Вернуть minDistance&lt;br&gt;&lt;/span&gt;" style="html=1;dashed=0;whitespace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="595" y="960" width="210" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

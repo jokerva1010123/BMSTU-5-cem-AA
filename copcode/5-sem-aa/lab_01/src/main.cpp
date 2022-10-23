@@ -156,65 +156,6 @@ int main() {
     cout << recLevCache(s1.c_str(), s2.c_str());
     cout << recDamLev(s1.c_str(), s2.c_str());
     cout << levCache(s1.c_str(), s2.c_str());
-//    string s1[10];
-//    string s2[10];
-//
-//    ifstream istr("/Users/kate/Desktop/aa/lab_01/src/strings.txt");
-//    if (istr.is_open())
-//    {
-//        for (int i = 0; i < 10; i++)
-//            istr >> s1[i] >> s2[i];
-//
-//        istr.close();
-
-        //python
-//        int (*(funcs[4]))(const char *, const char *) = {levCache, recDamLev, recLev, recLevCache};
-//        printf("x = [");
-//        for (int j = 0; j < 10; j++) {
-//            if (j != 9)
-//                printf("%d, ", j + 3);
-//            else
-//                printf("%d]\n", j + 3);
-//        }
-//        printf("y1 = [");
-//        for (int j = 0; j < 10; j++) {
-//            if (j != 9)
-//                printf("%.2lf, ", checkTime(funcs[0], s1[j].c_str(), s2[j].c_str()));
-//            else
-//                printf("%.2lf]\n", checkTime(funcs[0], s1[j].c_str(), s2[j].c_str()));
-//        }
-//        printf("y2 = [");
-//        for (int j = 0; j < 10; j++) {
-//            if (j != 9)
-//                printf("%.2lf, ", checkTime(funcs[1], s1[j].c_str(), s2[j].c_str()));
-//            else
-//                printf("%.2lf]\n", checkTime(funcs[1], s1[j].c_str(), s2[j].c_str()));
-//        }
-//        printf("y3 = [");
-//        for (int j = 0; j < 10; j++) {
-//            if (j != 9)
-//                printf("%.2lf, ", checkTime(funcs[2], s1[j].c_str(), s2[j].c_str()));
-//            else
-//                printf("%.2lf]\n", checkTime(funcs[2], s1[j].c_str(), s2[j].c_str()));
-//        }
-//        printf("y4 = [");
-//        for (int j = 0; j < 10; j++) {
-//            if (j != 9)
-//                printf("%.2lf, ", checkTime(funcs[3], s1[j].c_str(), s2[j].c_str()));
-//            else
-//                printf("%.2lf]\n", checkTime(funcs[3], s1[j].c_str(), s2[j].c_str()));
-//        }
-
-            // latex
-//        for (int j = 0; j < 10; j++) {
-//            printf("%d &", j + 3);
-//            for (int i = 0; i < 3; i++) {
-//                printf(" %.2lf &", checkTime(funcs[i], s1[j].c_str(), s2[j].c_str()));
-//            }
-//            printf(" %.2lf  \\\\ \n\\hline", checkTime(funcs[3], s1[j].c_str(), s2[j].c_str()));
-//            printf("\n");
-//        }
-//    }
 
     return 0;
 }

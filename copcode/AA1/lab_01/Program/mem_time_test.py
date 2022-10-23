@@ -102,6 +102,7 @@ def main():
               "%12d" % int(sum(lm_time_arr) / len(lm_time_arr)),
               "%15d" % int(sum(ldr_time_arr) / len(ldr_time_arr)),
               "%15d" % int(sum(ldm_time_arr) / len(ldm_time_arr)))
+        print(s_1, s_2)
 
     print("\n        -> Затрачиваемая алгоритмами память в байтах <-")
     print("| len |   LevRec   |   LevMat   |   LevDamRec   |   LevDamMat   |")
