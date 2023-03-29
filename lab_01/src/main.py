@@ -1,5 +1,5 @@
 from time import process_time
-from compareTime import compareAlgorithms
+from compareTime import compareAlgorithms, abc
 from algorythms import *
 
 EXIT = 0
@@ -42,7 +42,6 @@ def levenshteinDistance(str1, str2, output = True):
             matrix[i][j] = min(add, delete, change)
 
     if (output):
-        print("\nМатрица, с помощью которой происходило вычисление расстояния Левенштейна:")
         printMatrix(matrix, str1, str2)
 
     return matrix[n][m]
@@ -68,8 +67,6 @@ def damerauLevenshteinDistance(str1, str2, output = True):
             matrix[i][j] = min(add, delete, change, swap)
 
     if (output):
-        print("\nМатрица, с помощью которой происходило вычисление " +
-            "расстояния Дамерау-Левенштейна:")
         printMatrix(matrix, str1, str2)
 
     return matrix[n][m]
@@ -137,7 +134,6 @@ def damerauLevenshteinDistanceRecurciveCache(str1, str2, output = True):
     recursiveWithCache(str1, str2, n, m, matrix)
 
     if (output):
-        print("\nМатрица для кеша рекурсивного нахождения расстояния Дамерау-Левенштейна:")
         printMatrix(matrix, str1, str2)
 
     return matrix[n][m]
@@ -167,7 +163,8 @@ while (option != EXIT):
 
     elif (option == TEST):
         compareAlgorithms()
-
+    elif (option == 6):
+        abc()
     elif (option == EXIT):
         break
 

@@ -100,3 +100,30 @@ def compareAlgorithms():
     graphLevAndDamerauLev(timeLev)
     graphDamerauLev(timeDamerauLev, timeDamerauLevRecursive, timeDamerauLevRecursiveCache)
     graphDamerauLevMatrCache(timeDamerauLev, timeDamerauLevRecursiveCache)
+
+def abc():
+    sizes = [0, 1, 5, 10, 20, 50, 100, 200]
+    timeLev = []
+    timeDamerauLev = []
+    timeDamerauLevRecursive = []
+    timeDamerauLevRecursiveCache = []
+    for n in sizes:
+        timeLev.append(n*n)
+        timeDamerauLev.append(28+10*n+4*n*n)
+        timeDamerauLevRecursive.append(85*2*n)
+        timeDamerauLevRecursiveCache.append(4*n*n+4+2*69*n)
+    print(timeLev)
+    fig = plt.figure(figsize=(10, 7))
+    plot = fig.add_subplot()
+    plot.plot(sizes, timeLev, ":", label = "Левенштейн (матричный)")
+    plot.plot(sizes, timeDamerauLev, ":", label = "Дамерау-Левенштейн (матричный)")
+    plot.plot(sizes, timeDamerauLevRecursive, "", label="Дамерау-Левенштейн (рекурсия)")
+    plot.plot(sizes, timeDamerauLevRecursiveCache, "--", label="Дамерау-Левенштейн (с кэшем)")
+
+    plt.legend()
+    plt.grid()
+    plt.title("Затраты памяти")
+    plt.ylabel("Затраченная память")
+    plt.xlabel("Длина, символы")
+
+    plt.show()
