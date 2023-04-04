@@ -85,30 +85,31 @@ void test()
     int arr[9] = {50, 100, 200, 300, 500, 750, 1000, 2000, 5000};
     double s = 1, max_element;
     
-    s = 1;
-    double *matrix[2000];
-    for (int i = 0; i < 2000; i++)
-        matrix[i] = new double[2000];
     
-    for (int i = 0; i < 2000; i++)
-        for (int j = 0; j < 2000; j++)
-        {
-            matrix[i][j] = (rand() % 101) + 1;
-            s *= matrix[i][j];
-        }
-    double average = pow(s, (1.0)/(2000 * 2000));
-    int posi, posj;
-    int start = clock();
-    for (int i = 0; i < 200; i++)
-        find_standard(matrix, 2000, 2000, &max_element, &posi, &posj, average);
-    int end = clock();
-    cout << "Run without parallel: " << 1.0*(end - start)/200 << '\n';
-    for (int size = 1; size <= 16; size *= 2)
+    for (int size = 1; size <= 9; size ++)
     {
-        double x = 0;
-        cout << "Run parallel with " << size << " potok" << ": ";
+        s = 1;
+        double *matrix[arr[size]];
+        for (int i = 0; i < arr[size]; i++)
+        matrix[i] = new double[arr[size]];
+        for (int i = 0; i < arr[size]; i++)
+            for (int j = 0; j < arr[size]; j++)
+            {
+                matrix[i][j] = (rand() % 101) + 1;
+                s *= matrix[i][j];
+            }
+        double average = pow(s, (1.0)/(arr[size] * arr[size]));
+        int posi, posj;
+        int start = clock();
         for (int i = 0; i < 200; i++)
-            x += find_parallel(matrix, 2000, 2000, &max_element, &posi, &posj, average, size);
+            find_standard(matrix, arr[size], arr[size], &max_element, &posi, &posj, average);
+        int end = clock();
+        cout << "Run without parallel: " << 1.0*(end - start)/200 << '\n';
+    
+        double x = 0;
+        cout << "Run parallel with " << arr[size] << " potok" << ": ";
+        for (int i = 0; i < 200; i++)
+            x += find_parallel(matrix, arr[size], arr[size], &max_element, &posi, &posj, average, 32);
         cout << x/200 << '\n';
     }
 }
