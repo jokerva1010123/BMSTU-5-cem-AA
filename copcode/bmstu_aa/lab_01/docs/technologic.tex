@@ -1,0 +1,239 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут рассмотрены средства реализации задания, представлены листинги алгоритмов поиска расстояния Левенштейна и Дамерау-Левенштейна, а также тестовые данные, которые использовались для проверки корректности работы алгоритмов.
+
+
+\section{Выбор языка программирования и среды разработки}
+Для реализации алгоритмов был выбран язык программирования \textit{Python}, а в качестве среды разработки - \textit{PyCharm}.
+Для замеров процессорного времени использовалась функция \textit{process\_time()} \cite{time} из библиотеки \textit{time}, а для построения графиков - библиотека \textit{matplotlib} \cite{mpl}.
+
+
+\section{Реализация алгоритмов}
+Ниже представлены реализации алгоритмов поиска расстояний Левенштейна и Дамерау-Левенштейна (листинги \ref{lst:lev}--\ref{lst:d_l_rec_cache}).
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:lev,caption=Итерационный алгоритм поиска расстояния Левенштейна]
+def levenstein(str_1, str_2):
+    n, m = len(str_1), len(str_2)
+    matrix = [[0] * (n + 1) for _ in range(m + 1)]
+
+    for i in range(m + 1):
+        for j in range(n + 1):
+            if j == 0 and i > 0:
+                matrix[i][j] = i
+            if i == 0 and j > 0:
+                matrix[i][j] = j
+            if i > 0 and j > 0:
+                if str_1[j - 1] == str_2[i - 1]:
+                    res = 0
+                else:
+                    res = 1
+                matrix[i][j] = min(
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1,
+                    matrix[i - 1][j - 1] + res)
+
+    return matrix[m][n]
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:d_l_matr,caption=Итерационный алгоритм поиска расстояния Дамерау-Левенштейна]
+def damerau_levenstein(str_1, str_2):
+    n, m = len(str_1), len(str_2)
+    matrix = [[0] * (n + 1) for _ in range(m + 1)]
+
+    for i in range(m + 1):
+        for j in range(n + 1):
+            if i == 0 and j == 0:
+                matrix[i][j] = 0
+            if j == 0 and i > 0:
+                matrix[i][j] = i
+            if i == 0 and j > 0:
+                matrix[i][j] = j
+            if i > 0 and j > 0:
+                if str_1[j - 1] == str_2[i - 1]:
+                    res = 0
+                else:
+                    res = 1
+                matrix[i][j] = min(
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1,
+                    matrix[i - 1][j - 1] + res)
+
+                if str_1[j - 1] == str_2[i - 2] and str_1[j - 2] == str_2[i - 1]:
+                    matrix[i][j] = min(
+                        matrix[i][j],
+                        matrix[i - 2][j - 2] + 1)
+
+    return matrix[m][n]
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:d_l_rec,caption=Рекурсивный алгоритм поиска расстояния Дамерау-Левенштейна]
+def damerau_levenstein_recursive(str_1, str_2):
+    n, m = len(str_1), len(str_2)
+
+    if m == 0:
+        return n
+    if n == 0:
+        return m
+
+    if str_1[-1] == str_2[-1]:
+        mistake = 0
+    else:
+        mistake = 1
+
+    res = min(damerau_levenstein_recursive(str_1, str_2[:-1]) + 1,
+              damerau_levenstein_recursive(str_1[:-1], str_2) + 1,
+              damerau_levenstein_recursive(str_1[:-1], str_2[:-1]) + mistake)
+    if n > 1 and m > 1 and str_1[-1] == str_2[-2] and str_1[-2] == str_2[-1]:
+        res = min(res, damerau_levenstein_recursive(str_1[:-2], str_2[:-2]) + 1)
+    return res
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:d_l_rec_cache,caption=Рекурсивный алгоритм поиска расстояния Дамерау-Левен- штейна с кешем]
+def damerau_levenstein_recursive_cache(str_1, str_2, matrix):
+    n, m = len(str_1), len(str_2)
+
+    if m == 0:
+        matrix[m][n] = n
+    elif n == 0:
+        matrix[m][n] = m
+    else:
+        if matrix[m][n - 1] == -1:
+            damerau_levenstein_recursive_cache(str_1[:-1], str_2, matrix)
+        if matrix[m - 1][n] == -1:
+            damerau_levenstein_recursive_cache(str_1, str_2[:-1], matrix)
+        if matrix[m - 1][n - 1] == -1:
+            damerau_levenstein_recursive_cache(str_1[:-1], str_2[:-1], matrix)
+
+        matrix[m][n] = min(matrix[m][n - 1] + 1,
+                           matrix[m - 1][n] + 1,
+                           matrix[m - 1][n - 1] + int(str_1[-1] != str_2[-1]))
+
+        if n > 1 and m > 1 and str_1[-1] == str_2[-2] and str_1[-2] == str_2[-1]:
+            matrix[m][n] = min(matrix[m][n],
+                               matrix[m - 2][n - 2] + 1)
+
+        return
+
+
+def damerau_levenstein_recursive_cache_matrix(str_1, str_2):
+    n, m = len(str_1), len(str_2)
+
+    matrix = [[-1] * (n + 1) for _ in range(m + 1)]
+    damerau_levenstein_recursive_cache(str_1, str_2, matrix)
+
+    if info:
+        print_matrix(str_1, str_2, matrix)
+    return matrix[m][n]
+\end{lstlisting}
+\end{center}
+
+
+\section{Тестирование}
+Классы эквивалентности:
+
+\begin{itemize}
+    \item обе строки пустые;
+    \item одна строка пустая, другая - нет;
+    \item одинаковые строки;
+    \item строки, дающие один и тот же результат и для алгоритма Левенштейна, и для алгоритмов Дамерау-Левенштейна;
+    \item строки, дающие разные результаты для алгоритма Левенштейна и для алгоритмов Дамерау-Левенштейна.
+\end{itemize}
+
+В таблице \ref{tbl:tests} представлены модульные тесты. Все тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:tests} Модульные тесты}
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			&\multicolumn{2}{c|}{Входные данные}& \multicolumn{2}{c|}{Ожидаемый результат} \\
+			\hline
+			№&str\_1&str\_2&Левенштейн&Дамерау-Левенштейн \\
+			\hline
+            1&"Пустая строка"&"Пустая строка"&0&0 \\
+            \hline
+            2&"Пустая строка"&hugo&4&4 \\
+            \hline
+            3&applejack&"Пустая строка"&9&9 \\
+            \hline
+            4&house&house&0&0 \\
+			\hline
+			5&car&cars&1&1 \\
+			\hline
+            6&decode&decoding&3&3 \\
+			\hline
+			7&class&clsas&2&1 \\
+			\hline
+            8&kingtoys&ikdfotpq&7&6 \\
+			\hline
+            9&unique&nueqeu&5&3 \\
+			\hline
+            10&qwertyuiop&wqreytiupo&6&5 \\
+			\hline
+			11&sweetbloody&croatlbiawe&10&9 \\
+			\hline
+		\end{tabular}
+        \end{threeparttable}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+В этом разделе были рассмотрены средства реализации задания, представлены листинги алгоритмов поиска расстояния Левенштейна и Дамерау-Левенштейна, а также тесты.
+
+
+
+
+% \begin{table}[h]
+% 	\begin{center}
+%         \begin{threeparttable}
+%         \captionsetup{justification=raggedright,singlelinecheck=off}
+% 		\caption{\label{tbl:tests} Тесты}
+% 		\begin{tabular}{|c|c|c|c|c|c|}
+% 			\hline
+% 			& & & & \multicolumn{2}{c|}{Ожидаемый результат} \\
+% 			\hline
+% 			№&Описание теста&str\_1&str\_2&Левенштейн&Дамерау-Левенштейн \\
+% 			\hline
+%             1&Обе строки пустые&"Пустая строка"&"Пустая строка"&0&0 \\
+%             \hline
+%             2&Первая строка пустая&"Пустая строка"&hugo&4&4 \\
+%             \hline
+%             3&Вторая строка пустая&applejack&"Пустая строка"&9&9 \\
+%             \hline
+%             4&Одинаковые строки&house&house&0&0 \\
+% 			\hline
+% 			5&Строки отличаются 1 символом&car&cars&1&1 \\
+% 			\hline
+%             6&Строки отличающиеся 3 символами&decode&decoding&3&3 \\
+% 			\hline
+% 			7&Разные результаты для Л. и Д.-Л.&class&clsas&2&1 \\
+% 			\hline
+%             8&Разные результаты для Л. и Д.-Л.&kingtoys&ikdfotpq&7&6 \\
+% 			\hline
+%             9&Разные результаты для Л. и Д.-Л.&unique&nueqeu&5&3 \\
+% 			\hline
+%             10&Разные результаты для Л. и Д.-Л.&qwertyuiop&wqreytiupo&6&5 \\
+% 			\hline
+% 			11&Разные результаты для Л. и Д.-Л.&sweetbloody&croatlbiawe&10&9 \\
+% 			\hline
+% 		\end{tabular}
+%         \end{threeparttable}
+% 	\end{center}
+% \end{table}

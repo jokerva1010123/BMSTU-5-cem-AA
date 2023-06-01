@@ -1,0 +1,160 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут рассмотрены средства реализации лабораторной работы, представлены листинги алгоритмов умножения матриц, а также тестовые данные, которые использовались для проверки корректности работы алгоритмов.
+
+
+\section{Выбор языка программирования и среды разработки}
+Для реализации алгоритмов был выбран язык программирования \textit{Python}, а в качестве среды разработки -- \textit{PyCharm}.
+Для замеров процессорного времени использовалась функция \textit{process\_time()} \cite{time} из библиотеки \textit{time}, а для построения графиков -- библиотека \textit{matplotlib} \cite{mpl}.
+
+\section{Реализация алгоритмов}
+Ниже представлены реализации классического алгоритма умножения матриц и алгоритма Винограда с оптимизациями и без (листинги \ref{lst:classic}--\ref{lst:vinograd_opt}).
+
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:classic,caption= Классический алгоритм умножения матриц]
+def matrix_multiply(matrix1, matrix2):
+    matrix_res = [[0] * len(matrix1) for _ in range(len(matrix2[0]))]
+    for i in range(len(matrix1)):
+        for j in range(len(matrix2[0])):
+            matrix_res[i][j] = 0
+            for k in range(len(matrix1[0])):
+                matrix_res[i][j] = matrix_res[i][j] + matrix1[i][k] * matrix2[k][j]
+    return matrix_res
+\end{lstlisting}
+\end{center}
+
+\clearpage
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:vinograd,caption=Алгоритм Винограда]
+def vinograd(matrix1, matrix2):
+    rows1 = len(matrix1)
+    columns2 = len(matrix2[0])
+    columns1 = len(matrix1[0])
+    matrix_res = [[0] * rows1 for _ in range(columns2)]
+    row = [0] * rows1
+    column = [0] * columns2
+
+    for i in range(rows1):
+        for j in range(columns1 // 2):
+            row[i] = row[i] + matrix1[i][2 * j] * matrix1[i][2 * j + 1]
+
+    for i in range(columns2):
+        for j in range(columns1 // 2):
+            column[i] = column[i] + matrix2[2 * j][i] * matrix2[2 * j + 1][i]
+
+    for i in range(rows1):
+        for j in range(columns2):
+            matrix_res[i][j] = -row[i] - column[j]
+            for k in range(columns1 // 2):
+                matrix_res[i][j] = matrix_res[i][j] + (matrix1[i][2 * k + 1] + matrix2[2 * k][j]) * (matrix1[i][2 * k] + matrix2[2 * k + 1][j])
+
+    if columns1 % 2 == 1:
+        for i in range(rows1):
+            for j in range(columns2):
+                matrix_res[i][j] = matrix_res[i][j] + matrix1[i][columns1 - 1] * matrix2[columns1 - 1][j]
+
+    return matrix_res
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:vinograd_opt,caption=Алгоритм Винограда с оптимизациями]
+def optimized_vinograd(matrix1, matrix2):
+    rows1 = len(matrix1)
+    columns2 = len(matrix2[0])
+    columns1 = len(matrix1[0])
+    matrix_res = [[0] * rows1 for _ in range(columns2)]
+    row = [0] * rows1
+    column = [0] * columns2
+
+    for i in range(rows1):
+        for j in range(columns1 // 2):
+            row[i] += matrix1[i][j << 1] * matrix1[i][(j << 1) + 1]
+
+    for i in range(columns2):
+        for j in range(columns1 // 2):
+            column[i] += matrix2[j << 1][i] * matrix2[(j << 1) + 1][i]
+
+    for i in range(rows1):
+        buf = -row[i]
+        for j in range(columns2):
+            matrix_res[i][j] = buf - column[j]
+            for k in range(columns1 // 2):
+                ind = k << 1
+                matrix_res[i][j] += (matrix1[i][ind + 1] + matrix2[ind][j]) * (matrix1[i][ind] + matrix2[ind + 1][j])
+
+    if columns1 % 2 == 1:
+        for i in range(rows1):
+            buf = matrix1[i][columns1 - 1]
+            for j in range(columns2):
+                matrix_res[i][j] += buf * matrix2[columns1 - 1][j]
+
+    return matrix_res
+\end{lstlisting}
+\end{center}
+
+\section{Тестирование}
+Классы эквивалентности:
+
+\begin{itemize}
+    \item две пустые матрицы;
+    \item первая матрица пустая;
+    \item вторая матрица пустая;
+    \item матрицы, у которых число столбцов первой не равно числу строк второй;
+    \item две нулевые матрицы;
+    \item первая матрица нулевая;
+    \item вторая матрица нулевая;
+    \item две единичные матрицы;
+    \item первая матрица единичная;
+    \item вторая матрица единичная;
+    \item две случайно заполненные матрицы.
+\end{itemize}
+
+В таблице \ref{tbl:tests} представлены модульные тесты. Все тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+        \captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:tests} Модульные тесты}
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\hline
+			&\multicolumn{2}{c|}{Входные данные}& \multicolumn{3}{c|}{Ожидаемый результат} \\
+			\hline
+			№&mtr1&mtr2&Классич.&Винограда&Винограда\\ 
+			& & & & & с опт. \\
+			\hline
+            1&( )&( )&Error&Error&Error \\
+            \hline
+            2&( )&\myMtrTwoTwo{1}{2}{3}{4}&Error&Error&Error \\
+            \hline
+            3&\myMtrTwoTwo{1}{2}{3}{4}&( )&Error&Error&Error \\
+            \hline
+            4&\myMtrTwoThree{1}{2}{3}{4}{5}{6}&\myMtrTwoTwo{5}{0}{3}{7}&Error&Error&Error \\
+			\hline
+			5&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0} \\
+			\hline
+			6&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{3}{9}{2}{1}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0} \\
+			\hline
+			7&\myMtrTwoTwo{4}{5}{3}{2}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0}&\myMtrTwoTwo{0}{0}{0}{0} \\
+			\hline
+			8&\myMtrTwoTwo{1}{0}{0}{1}&\myMtrTwoTwo{1}{0}{0}{1}&\myMtrTwoTwo{1}{0}{0}{1}&\myMtrTwoTwo{1}{0}{0}{1}&\myMtrTwoTwo{1}{0}{0}{1} \\
+			\hline
+			9&\myMtrTwoTwo{1}{0}{0}{1}&\myMtrTwoTwo{2}{8}{9}{-4}&\myMtrTwoTwo{2}{8}{9}{-4}&\myMtrTwoTwo{2}{8}{9}{-4}&\myMtrTwoTwo{2}{8}{9}{-4} \\
+			\hline
+			10&\myMtrTwoTwo{7}{5}{3}{10}&\myMtrTwoTwo{1}{0}{0}{1}&\myMtrTwoTwo{7}{5}{3}{10}&\myMtrTwoTwo{7}{5}{3}{10}&\myMtrTwoTwo{7}{5}{3}{10} \\
+			\hline
+			11&\myMtrTwoThree{1}{2}{3}{4}{5}{6}&\myMtrThreeTwo{1}{2}{3}{4}{5}{6}&\myMtrTwoTwo{22}{28}{49}{64}&\myMtrTwoTwo{22}{28}{49}{64}&\myMtrTwoTwo{22}{28}{49}{64} \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+\FloatBarrier
+
+
+\section*{Вывод}
+
+В этом разделе были рассмотрены средства реализации лабораторной работы, представлены листинги классического алгоритма умножения матриц и алгоритма Винограда с отпимизациями и без, а также модульные тесты.

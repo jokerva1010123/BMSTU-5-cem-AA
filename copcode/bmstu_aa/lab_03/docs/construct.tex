@@ -1,0 +1,218 @@
+\chapter{Конструкторская часть}
+В данном разделе будут представлены схемы алгоритмов сортировок, рассмотренных в аналитической части, выбранные типы данных и вывод оценки трудоемкости алгоритмов.
+
+\section{Алгоритмы сортировки}
+Схемы алгоритмов сортировки представлены на рисунках \ref{img:heapify}--\ref{img:shakersort}.
+
+\imgScale{0.65}{heapify}{Пирамидальная сортировка (перестройка сортирующего дерева)}
+\imgScale{0.65}{heapsort}{Пирамидальная сортировка}
+\imgScale{0.7}{selectionsort}{Сортировка выбором}
+\imgScale{0.5}{shakersort}{Сортировка перемешиванием (шейкерная)}
+\clearpage
+
+
+\section{Описание типов данных}
+Выбранные типы данных:
+
+\begin{itemize}[label=---]
+    \item массив типа \textit{int};
+    \item длина массива --- тип \textit{int}. 
+\end{itemize}
+
+
+\section{Оценка трудоемкости алгоритмов}
+Для вывода оценки трудоемкости алгоритмов следует описать модель оценки трудоемкости.
+
+\begin{enumerate}
+    \item Трудоемкость базовых операций:
+    %\begin{itemize}[label=---]
+    \begin{enumerate}[label=1.\arabic*.]
+       \item /, \%, * --- 2;
+        \item =, +=, --=, ++, $--$, ==, !=, <, <=, >, >=, +, -, $<<$, $>>$, [ ] --- 1.
+    \end{enumerate}
+    \item Трудоемкость цикла с N итерациями:
+    
+        $f_{for}$ = $f_{\text{инициализации}}$ + $f_{\text{сравнения}}$ + N($f_{\text{тела}}$ + $f_{\text{инкремент}}$ + $f_{\text{сравнения}}$).
+        
+    \item Трудоемкость условного оператора:
+    
+        $f_{if}$ = $f_{\text{условия}}$ +
+		\begin{cases}
+			f_A, & \text{если условие выполняется,}\\
+			f_B, & \text{иначе.}
+		\end{cases}
+\end{enumerate}
+
+Вывод оценки трудоемкости алгоритмов заданных сортировок приведен ниже.
+
+%\begin{itemize}
+    %\item
+    \textbf{Пирамидальная сортировка}
+    
+    В таблице \ref{tbl:heap_weight} представлена построчная оценка трудоемкости пирамидальной сортировки.
+    \begin{table}[h]
+    \begin{center}
+        \begin{threeparttable}
+        \captionsetup{}
+        \caption{\label{tbl:heap_weight}Построчная оценка трудоемкости пирамидальной сортировки}
+        \begin{tabular}{|l|c|}
+            \hline
+            Строка кода & Вес \\
+            \hline
+            largest = i & 1 \\ 
+            \hline
+            left = 2 * i + 1 & 4 \\ 
+            \hline
+            right = 2 * i + 2 & 4 \\ 
+            \hline
+            if left >= n and right >= n: & 2 \\ 
+            \hline
+            ~~~~return & 0 \\ 
+            \hline
+            if left < n and arr[i] < arr[left]: & 4 \\ 
+            \hline
+            ~~~~largest = left & 1 \\ 
+            \hline
+            if right < n and arr[largest] < arr[right]: & 4 \\ 
+            \hline
+            ~~~~largest = right & 1 \\ 
+            \hline
+            if largest != i: & 1 \\ 
+            \hline
+            ~~~~arr[i], arr[largest] = arr[largest], arr[i] & 5 \\ 
+            \hline
+            ~~~~heapify(arr, n, largest) & 0 \\ 
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+    \end{center}
+    \end{table}
+
+    \FloatBarrier
+    
+    Для процесса перестройки бинарного дерева  из $N$ элементов в худшем случае потребуется $log_2 N$ операций. После $N$ итераций все элементы будут отсортированы, а значит сложность сортировки определяестя формулой $N \cdot log_2 N$.
+    
+    Итого трудоемкость -- O($N \cdot log_2 N$).
+    
+    %\item 
+    \textbf{Сортировка выбором}
+    
+    В таблице \ref{tbl:selection_weight} представлена построчная оценка трудоемкости сортировки выбором.
+    \begin{table}[h]
+    \begin{center}
+        \begin{threeparttable}
+        \captionsetup{}
+        \caption{\label{tbl:selection_weight}Построчная оценка трудоемкости сортировки выбором}
+        \begin{tabular}{|l|c|}
+            \hline
+            Строка кода & Вес \\
+            \hline
+            for i in range(len(arr)): & 3 \\ 
+            \hline
+            ~~~~minind = i & 1 \\ 
+            \hline
+            ~~~~for j in range(i + 1, len(arr)): & 4 \\ 
+            \hline
+            ~~~~~~~~if arr[j] < arr[minind]: & 3 \\ 
+            \hline
+            ~~~~~~~~~~~~minind = j & 1 \\ 
+            \hline
+            ~~~~arr[i], arr[minind] = arr[minind], arr[i] & 5 \\ 
+            \hline
+            return arr & 0 \\ 
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+    \end{center}
+    \end{table}
+
+    \FloatBarrier
+    
+    В лучшем случае (когда массив уже отсортирован в порядке возрастания):
+
+    f = 2 + N(3 + N(3 + 5 + 2)) = O($N^2$).
+    
+    В худшем случае (массив отсортирован в обратном порядке):
+    
+    f = 2 + N(3 + N(3 + 6 + 2)) = O($N^2$).
+     
+    Итого трудоемкость -- O($N^2$).
+
+    %\item
+    \textbf{Сортировка перемешиванием}
+    
+    В таблице \ref{tbl:shaker_weight} представлена построчная оценка трудоемкости сортировки перемешиванием.
+    \begin{table}[h]
+    \begin{center}
+        \begin{threeparttable}
+        \captionsetup{}
+        \caption{\label{tbl:shaker_weight}Построчная оценка трудоемкости сортировки перемешиванием}
+        \begin{tabular}{|l|c|}
+            \hline
+            Строка кода & Вес \\
+            \hline
+            left = 0 & 1 \\ 
+            \hline
+            right = len(arr) - 1 & 2 \\ 
+            \hline
+            while left < right: & 1 \\ 
+            \hline
+            ~~~~rnew = left & 2 \\ 
+            \hline
+            ~~~~for i in range(left, right): & 3 \\ 
+            \hline
+            ~~~~~~~~if arr[i] > arr[i + 1]: & 4 \\ 
+            \hline
+            ~~~~~~~~~~~~arr[i], arr[i + 1] = arr[i + 1], arr[i] & 7 \\ 
+            \hline
+            ~~~~~~~~~~~~rnew = i & 1 \\ 
+            \hline
+            ~~~~right = rnew & 1 \\ 
+            \hline
+            ~~~~lnew = right & 1 \\ 
+            \hline
+            ~~~~for i in range(right - 1, left - 1, -1): & 5 \\ 
+            \hline
+            ~~~~~~~~if arr[i] > arr[i + 1]: & 4 \\ 
+            \hline
+            ~~~~~~~~~~~~arr[i], arr[i + 1] = arr[i + 1], arr[i] & 7 \\ 
+            \hline
+            ~~~~~~~~~~~~lnew = i & 1 \\ 
+            \hline
+            ~~~~left = lnew & 1 \\ 
+            \hline
+            return arr & 0 \\ 
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+    \end{center}
+    \end{table}
+
+    \FloatBarrier
+    
+    В лучшем случае (массив отсортирован):
+
+    f = 4 + N(4 + 5 + 5) = O(N).
+    
+    В худшем случае (массив отсортирован в обратном порядке):
+    
+    f = 2 + N(4 + 2 + N(2 + 12) + 2 + N(2 + 12)) = O($N^2$).
+     
+    Итого трудоемкость -- O($N^2$).
+    
+%\end{itemize}
+
+
+
+\section{Исходные файлы программы}
+Программа состоит из следующих модулей:
+\begin{itemize}[label=---]
+	\item $main.py$ -- файл с главной функцией, вызывающей меню программы;
+    \item $sorts.py$ -- файл, содержащий код алгоритмов сортировок;
+    \item $proc\_time.py$ -- файл с функциями подсчета процессорного времени алгоритмов.
+\end{itemize}
+
+\section*{Вывод}
+В этом разделе были представлены схемы алгоритмов пирамидальной сортировки и сортировок выбором и перемешиванием, вывод оценки их трудоемкости и выбранные типы данных.
+
+Проведя анализ трудоемкости алгоритмов, можно сказать, что в большинстве случаев пирамидальная сортировка является более предпочтительной, однако сортировка перемешиванием менее затратна при работе с отсортированным массивом.

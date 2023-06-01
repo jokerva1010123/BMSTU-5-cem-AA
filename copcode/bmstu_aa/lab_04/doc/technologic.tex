@@ -1,0 +1,175 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут выбраны язык программирования, среда разработки, а также представлены листинги кода реализации алгоритмов поиска определителя.
+
+\section{Средства реализации}
+Для реализации алгоритмов был выбран язык программирования C++, в котором существует библиотека time.h~\cite{time.h} для замера процессорного времени. С помощью полученных результатов времени будут построены графики для наглядного отображения временной эффективности алгоритмов. Будет использована среда разработки CLion.
+
+\section{Сведения о модулях программы}
+Программа состоит из одного модуля --- $main.c$ — файл, содержащий код алгоритмов, создания и заполнения матрицы, вывода замеренного процессорного времени и весь второстепенный код.
+
+В листингах \ref{lst:del}, \ref{lst:det} и \ref{lst:detparallel} представлены реализации функции удаления матрицы \textit{i}\textit{-ой} строки и \textit{j}\textit{-ого} столбца и алгоритма поиска определителя с получением замеров процессорного времени, затраченного на их выполнение.
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:del,caption=Функция удаления \textit{i}\textit{-ой} строки и \textit{j}\textit{-ого} столбца]
+void getMatrixWithoutRowAndCol(int **matrix, int size, int row, int col, int **newMatrix)
+{
+    int offsetRow = 0;
+    int offsetCol = 0;
+    for(int i = 0; i < size-1; i++)
+	{
+        if(i == row)
+		{
+            offsetRow = 1;
+        }
+        offsetCol = 0;
+        for(int j = 0; j < size-1; j++)
+		{
+            if(j == col)
+			{
+                offsetCol = 1;
+            }
+            newMatrix[i][j] = matrix[i + offsetRow][j + offsetCol];
+        }
+    }
+}
+\end{lstlisting}
+\end{center}
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:det,caption=Алгоритм нахождения определителя матрицы через миноры]
+int matrixDet(int **matrix, int size)
+{
+    time_t startt = 0, endt = 0;
+    int det = 0;
+    int degree = 1;
+    startt = clock();
+    
+    if(size == 1)
+	{
+        return matrix[0][0];
+    }
+    else if(size == 2)
+	{
+        return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0];
+    }
+    else
+	{
+        int **newMatrix = new int*[size-1];
+        for(int i = 0; i < size-1; i++)
+		{
+            newMatrix[i] = new int[size-1];
+        }
+        for(int j = 0; j < size; j++)
+		{
+            getMatrixWithoutRowAndCol(matrix, size, 0, j, newMatrix);
+            det = det + (degree * matrix[0][j] * matrixDet(newMatrix, size-1));
+            degree = -degree;
+        }
+        for(int i = 0; i < size-1; i++)
+		{
+            delete [] newMatrix[i];
+        }
+        delete [] newMatrix;
+    }
+    
+    endt = clock();
+    return endt - startt;
+}
+\end{lstlisting}
+\end{center}
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:detparallel,caption= Функция вспомогательного потока]
+void for_parallel(int size, int **matrix, int *det, int *degree)
+{
+    int **newMatrix = new int*[size-1];
+    for(int i = 0; i < size-1; i++)
+	{
+	    newMatrix[i] = new int[size-1];
+    }
+    for(int j = 0; j < size; j++)
+	{
+        getMatrixWithoutRowAndCol(matrix, size, 0, j, newMatrix);
+        *det = *det + (*degree * matrix[0][j] * matrixDet(newMatrix, size-1));
+        *degree = -(*degree);
+    }
+    for(int i = 0; i < size-1; i++)
+	{
+        delete [] newMatrix[i];
+    }
+    delete [] newMatrix;
+}
+        
+int matrixDetparallel(int **matrix, int size)
+{
+    clock_t startt, endt;
+    int det = 0;
+    int degree = 1;
+    
+    startt = clock();
+    if(size == 1)
+	{
+        return matrix[0][0];
+    }
+    else if(size == 2)
+	{
+        return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0];
+    }
+    else
+	{
+	    std::thread mas_potoks[size];
+	    for (int k = 0; k < size; k++)
+	    {
+	        mas_potoks[k] = std::thread(for_parallel, size, matrix, &det, &degree);
+	    }
+	    
+	    for (int k = 0; k < size; k++)
+	        mas_potoks[k].join();
+    }
+    
+    endt = clock();
+    return endt - startt;
+}
+\end{lstlisting}
+\end{center}
+
+\section{Классы эквивалентности при тестировании}
+
+Для тестирования выделены следующие классы эквивалентности.
+\begin{enumerate}
+	\item Пустая матрица.
+	\item Матрица не квадратная.
+	\item Квадратная матрица.
+\end{enumerate}
+
+\section{Функциональные тесты}
+
+В таблице \ref{tbl:functional_test} приведены функциональные тесты для реализаций алгоритма поиска определителя матрицы.  
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+		\captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:functional_test} Функциональные тесты}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			Входная матрица & Ожидаемый результат & Результат \\ 
+			\hline
+			$"пустая матрица"$ & матрица пустая & матрица пустая\\
+			$[1, 2] [3, 4]$ & $-2$  & $-2$\\
+			$[1, 2] [3, 4] [5, 6]$ & матрица не квадратная & матрица не квадратная\\
+			\hline
+		\end{tabular}
+    \end{threeparttable}
+	\end{center}
+\end{table}
+
+Все тесты пройдены успешно реализациями последовательного алгоритма поиска определителя матрицы и алгоритма с распараллеливанием.
+
+\section*{Вывод}
+
+В технологической части лабораторной работы были выбраны язык программирования и среда разработки, приведены листинги алгоритма, проведено функциональное тестирование, а также приведены технические характеристики устройства, на котором проводятся замеры времени работы алгоритма.

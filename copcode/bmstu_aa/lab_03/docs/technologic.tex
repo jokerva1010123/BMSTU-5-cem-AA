@@ -1,0 +1,138 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут рассмотрены средства реализации лабораторной работы, представлены листинги алгоритмов сортировки, а также тестовые данные, которые использовались для проверки корректности работы алгоритмов.
+
+
+\section{Выбор языка программирования и среды разработки}
+Для реализации алгоритмов был выбран язык программирования \textit{Python}, так как он предоставляет необходимую функциональность, позволяющую решить поставленные задачи на реализацию алгоритмов и выполнение замеров процессорного времени работы их реализаций, а в качестве среды разработки -- \textit{PyCharm}.
+Для замеров процессорного времени использовалась функция \textit{process\_time()} \cite{time} из библиотеки \textit{time}, а для построения графиков -- библиотека \textit{matplotlib} \cite{mpl}.
+
+\section{Реализация алгоритмов}
+Ниже представлены реализации алгоритмов сортировки перемешиванием, выбором и пирамидальной сортировки (листинги \ref{lst:heapify}--\ref{lst:shakersort}).
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:heapify,caption= Пирамидальная сортировка (перестройка сортирующего дерева)]
+def heapify(arr, n, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left >= n and right >= n:
+        return
+
+    if left < n and arr[i] < arr[left]:
+        largest = left
+
+    if right < n and arr[largest] < arr[right]:
+        largest = right
+
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:heapsort,caption=Пирамидальная сортировка]
+def heapsort(arr):
+    n = len(arr)
+
+    for i in range(n, -1, -1):
+        heapify(arr, n, i)
+
+    for i in range(n - 1, 0, -1):
+        arr[i], arr[0] = arr[0], arr[i]
+        heapify(arr, i, 0)
+
+    return arr
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:selectionsort,caption=Сортировка выбором]
+def selectionsort(arr):
+    for i in range(len(arr)):
+        minind = i
+        for j in range(i + 1, len(arr)):
+            if arr[j] < arr[minind]:
+                minind = j
+        arr[i], arr[minind] = arr[minind], arr[i]
+    return arr
+\end{lstlisting}
+\end{center}
+
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:shakersort,caption=Сортировка перемешиванием (шейкерная)]
+def shakersort(arr):
+    left = 0
+    right = len(arr) - 1
+    while left < right:
+        r_new = left
+        for i in range(left, right):
+            if arr[i] > arr[i + 1]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                r_new = i
+        right = r_new
+        l_new = right
+        for i in range(right - 1, left - 1, -1):
+            if arr[i] > arr[i + 1]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                l_new = i
+        left = l_new
+    return arr
+\end{lstlisting}
+\end{center}
+
+
+\section{Тестирование}
+Классы эквивалентности:
+
+\begin{itemize}[label=---]
+    \item пустой массив;
+    \item массив из одного элемента;
+    \item массив из одинаковых элементов;
+    \item отсортированный по возрастанию массив;
+    \item отсортированный по убыванию массив;
+    \item неотсортированный массив.
+\end{itemize}
+
+В таблице \ref{tbl:tests} представлены модульные тесты. Все тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:tests} Модульные тесты}
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			&Входные данные& \multicolumn{3}{c|}{Ожидаемый результат} \\
+			\hline
+			№&Массив&Пирамидальная&Выбором&Перемешиванием \\
+			\hline
+            1&[ ]&[ ]&[ ]&[ ] \\
+            \hline
+            2&[5]&[5]&[5]&[5] \\
+            \hline
+            3&[8, 8, 8, 8, 8]&[8, 8, 8, 8, 8]&[8, 8, 8, 8, 8]&[8, 8, 8, 8, 8] \\
+            \hline
+            4&[1, 5, 8, 10]&[1, 5, 8, 10]&[1, 5, 8, 10]&[1, 5, 8, 10] \\
+			\hline
+			5&[10, 7, 3, -1]&[-1, 3, 7, 10]&[-1, 3, 7, 10]&[-1, 3, 7, 10] \\
+			\hline
+            6&[8, 0, 12, -4]&[-4, 0, 8, 12]&[-4, 0, 8, 12]&[-4, 0, 8, 12] \\
+			\hline
+		\end{tabular}
+        \end{threeparttable}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+В этом разделе были рассмотрены средства реализации лабораторной работы, представлены листинги алгоритмов сортировок перемешиванием, выбором и пирамидальной сортировки, а также модульные тесты.

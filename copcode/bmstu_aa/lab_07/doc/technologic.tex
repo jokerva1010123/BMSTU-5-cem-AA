@@ -1,0 +1,53 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут рассмотрены средства реализации лабораторной работы, представлены тестовые данные, которые использовались для проверки корректности работы алгоритмов.
+
+\section{Выбор языка программирования и среды \\разработки}
+Для реализации алгоритмов был выбран язык \textit{Python}, так как он предоставляет необходимую функциональность, позволяющую решить поставленные задачи на реализацию алгоритмов, а в качестве среды разработки --- \textit{PyCharm}.
+Для построения графиков использовалась библиотека \textit{matplotlib}~\cite{mpl}.
+
+
+\section{Тестирование}
+Классы эквивалентности:
+
+\begin{itemize}[label=---]
+    \item использование одиночных термов;
+    \item использование составных термов с <<очень>>;
+    \item использование составных термов с <<не>> и <<очень>>.
+\end{itemize}
+
+В таблице \ref{tbl:tests} представлены тесты. Все тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:tests} Функциональные тесты}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Запрос& Ожидаемы результат & Фактический результат \\
+			\hline
+            медленные автомобили & Niva 4x4 & Niva 4x4 \\
+			\hline
+                                     & Toyota Mark II & Toyota Mark II \\
+                                     & Subaru Impreza & Subaru Impreza \\
+            очень быстрые            & Ford Mustang & Ford Mustang \\
+              автомобили             & BMW X6 & BMW X6 \\
+                                     & BMW X5 & BMW X5 \\
+                                     & BMW M4 & BMW M4 \\
+            \hline
+            не очень быстрые & Niva 4x4 & Niva 4x4 \\
+              автомобили       & Lada Granta & Lada Granta \\
+            \hline
+                                     & Lada Granta & Lada Granta \\
+                                     & Mazda 6 & Mazda 6 \\
+            не очень медленные       & Mazda 3 & Mazda 3 \\
+              автомобили             & Nissan Skyline & Nissan Skyline \\
+                                     & Nissan Silvia & Nissan Silvia \\
+                                     & Toyota Land Cruiser & Toyota Land Cruiser \\
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+	\end{center}
+\end{table}
+\FloatBarrier

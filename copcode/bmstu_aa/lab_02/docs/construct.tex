@@ -1,0 +1,342 @@
+\chapter{Конструкторская часть}
+В данном разделе будут представлены схемы алгоритмов умножения матриц, рассмотренных в аналитической части, выбранные типы данных и вывод оценки трудоемкости алгоритмов.
+
+\section{Алгоритмы умножения матриц}
+Схемы алгоритмов умножения матриц представлены ниже на рисунках \ref{img:classic}-\ref{img:vinograd_opt2}.
+
+\imgScale{0.7}{classic}{Классический алгоритм умножения матриц}
+\imgScale{0.75}{vinograd1}{Алгоритм Винограда (часть 1)}
+\imgScale{0.75}{vinograd2}{Алгоритм Винограда (часть 2)}
+\imgScale{0.75}{vinograd_opt1}{Алгоритм Винограда с оптимизациями (часть 1)}
+\imgScale{0.75}{vinograd_opt2}{Алгоритм Винограда с оптимизациями (часть 2)}
+\clearpage
+
+
+\section{Описание типов данных}
+Выбранные типы данных:
+
+\begin{itemize}
+    \item матрица - массив массивов типа \textit{float};
+    \item количество строк матрицы - тип \textit{int};
+    \item количество столбцов матрицы - тип \textit{int};
+    \item дополнительные массивы типа \textit{float}.
+\end{itemize}
+
+Для матрицы выбран тип \textit{float}, так как данный тип охватывает и целые числа, и вещественные, а это необходима для полноценного тестирования работы алгоритмов.
+
+
+\section{Оценка трудоемкости алгоритмов}
+Для вывода оценки трудоемкости алгоритмов существуют определенные правила.
+
+\begin{enumerate}
+    \item Трудоемкость трех операций (/, \%, *) равна 2, а для всех остальных (=, +=, -=, ++, $--$, ==, !=, <, <=, >, >=, +, -, $<<$, $>>$, [ ]) -- <<штраф>> равен 1.
+    % (=, +=, -=, ++, $--$, ==, !=, <, <=, >, >=, +, -, $<<$, $>>$, [ ])
+    
+    \item Трудоемкость цикла:
+        \begin{equation}
+            f_{for} = f_{\text{инициализации}} + f_{\text{сравнения}} + N(f_{\text{тела}} + f_{\text{инкремент}} + f_{\text{сравнения}})
+        \end{equation}
+        
+    \item Трудоемкость условного оператора:
+        \begin{equation}
+           f_{if} = f_{\text{условия}} +
+    		\begin{cases}
+    			f_A, & \text{если условие выполняется,}\\
+    			f_B, & \text{иначе.}
+    		\end{cases} 
+        \end{equation}
+        
+\end{enumerate}
+
+\clearpage
+Вывод оценки трудоемкости алгоритмов заданных сортировок:
+
+\begin{itemize}
+    \item \textbf{Классический алгоритм умножения матриц}
+    
+    В таблице \ref{tbl:classic} представлена построчная оценка трудоемкости классического алгоритма умножения матриц.
+    \begin{table}[h]
+    \begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright}
+        \caption{\label{tbl:classic}Построчная оценка трудоемкости классического алгоритма умножения матриц}
+        \begin{tabular}{|l|c|}
+            \hline
+            Строка кода & Вес \\
+            \hline
+            for i in range(len(matrix1)): & 3 \\ 
+            \hline
+            for j in range(len(matrix2[0])): & 4 \\ 
+            \hline
+            matrix\_res[i][j] = 0 & 3 \\ 
+            \hline
+            for k in range(len(matrix1[0])): & 4 \\ 
+            \hline
+            matrix\_res[i][j] = matrix\_res[i][j] + matrix1[i][k] * matrix2[k][j] & 12 \\ 
+            \hline
+            return matrix\_res & 0 \\ 
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+    \end{center}
+    \end{table}
+
+    \FloatBarrier
+    
+    \begin{itemize}
+        \item Трудоемкость цикла по $i \in [1..N]$: 
+            \begin{equation}
+                f = 2 + N \cdot (2 + f_{body})
+            \end{equation}
+        \item Трудоемкость цикла по $j \in [1..M]$:
+            \begin{equation}
+                f = 2 + M \cdot (2 + f_{body})
+            \end{equation}
+        \item Трудоемкость цикла по $k \in [1..K]$:
+            \begin{equation}
+                f = 2 + K \cdot (2 + 12)
+            \end{equation}
+    \end{itemize}
+    
+    
+    Итого трудоемкость:
+    \begin{equation}
+        f = 2 + N \cdot (4 + M \cdot (4 + 14K)) \approx 14NMK
+    \end{equation}
+        
+    \clearpage
+    \item \textbf{Алгоритм Винограда}
+    
+    В таблице \ref{tbl:vinograd} представлена построчная оценка трудоемкости алгоритма Винограда.
+    \begin{table}[h]
+    \begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright}
+        \caption{\label{tbl:vinograd}Построчная оценка трудоемкости алгоритма Винограда}
+        \begin{tabular}{|l|c|}
+            \hline
+            Строка кода & Вес \\
+            \hline
+            rows1 = len(matrix1) & 1 \\ 
+            \hline
+            columns2 = len(matrix2[0]) & 2 \\ 
+            \hline
+            columns1 = len(matrix1[0]) & 2 \\ 
+            \hline
+            row = [0] * rows1 & $rows1 \cdot 2$ \\ 
+            \hline
+            column = [0] * columns2 & $columns2 \cdot 2$\\ 
+            \hline
+            for i in range(rows1): & 3 \\ 
+            \hline
+            for j in range(columns1 // 2): & 5 \\ 
+            \hline
+            row[i] = row[i] + matrix1[i][2 * j] * matrix1[i][2 * j + 1] & 15 \\ 
+            \hline
+            for i in range(columns2): & 3 \\ 
+            \hline
+            for j in range(columns1 // 2): & 5 \\ 
+            \hline
+            column[i] = column[i] + matrix2[2 * j][i] * matrix2[2 * j + 1][i] & 15 \\ 
+            \hline
+            for i in range(rows1): & 3\\ 
+            \hline
+            for j in range(columns2): & 3 \\ 
+            \hline
+            matrix\_res[i][j] = -row[i] - column[j] & 7 \\ 
+            \hline
+            for k in range(columns1 // 2): & 5 \\ 
+            \hline
+            matrix\_res[i][j] = matrix\_res[i][j] + (matrix1[i][2 * k + 1] & \\ + matrix2[2 * k][j]) * (matrix1[i][2 * k] + matrix2[2 * k + 1][j]) & 28 \\ 
+            \hline
+            if columns1 \% 2 == 1: & 3 \\ 
+            \hline
+            for i in range(rows1): & 3 \\ 
+            \hline
+            for j in range(columns2): & 3\\ 
+            \hline
+            matrix\_res[i][j] = matrix\_res[i][j] + matrix1[i][columns1 - 1] & \\ * matrix2[columns1 - 1][j] & 14 \\ 
+            \hline
+            return matrix\_res & 0 \\ 
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+    \end{center}
+    \end{table}
+
+    \FloatBarrier
+    
+    Подсчет трудоемкости.
+    
+    \begin{itemize}
+        \item Создание вспомогательных массивов: 
+        \begin{equation}
+            f_{arr} = 2 \cdot (rows1 + columns1)
+        \end{equation}
+        
+        \item Работа с массивом $row$ (первый цикл):
+        \begin{equation}
+            f_{row} = 2 + rows1 \cdot (4 + 17 \cdot \frac{columns1}{2})
+        \end{equation}
+        
+        \item Работа с массивом $column$ (второй цикл):
+        \begin{equation}
+            f_{column} = 2 + columns2 \cdot (4 + 17 \cdot \frac{columns1}{2})
+        \end{equation}
+        
+        \item Цикл заполнения результирующей матрицы: 
+        \begin{equation}
+            f_{res} = 2 + rows1 \cdot (4 + columns2 \cdot (13 + 15 \cdot columns1))
+        \end{equation}
+        
+        \item Дополнительный цикл, если матрица нечетного размера: 
+        \begin{equation}
+            f_{extra} = 2 + rows1 \cdot (4 + 17 \cdot columns2)
+        \end{equation}
+    \end{itemize}
+    
+    Трудоемкость для лучшего случая (количество столбцов первой матрицы -- четное):
+    \begin{equation}
+        f = 2f_{arr} + f_{row} + f_{column} + f_{res} + 2 \approx 15 \cdot rows1 \cdot columns1 \cdot columns2
+    \end{equation}
+    
+    Трудоемкость для худшего случая (количество столбцов первой матрицы -- нечетное):
+    \begin{equation}
+    \begin{split}
+        f = 2f_{arr} + f_{row} + f_{column} + f_{res} + f_{extra} \approx \\
+        \approx 15 \cdot rows1 \cdot columns1 \cdot columns2
+    \end{split}
+    \end{equation}
+     
+    \clearpage
+    \item \textbf{Алгоритм Винограда с оптимизациями}
+    
+    В таблице \ref{tbl:vinograd_opt} представлена построчная оценка трудоемкости алгоритма Винограда с оптимизациями.
+    \begin{table}[h]
+    \begin{center}
+        \begin{threeparttable}
+        \captionsetup{justification=raggedright}
+        \caption{\label{tbl:vinograd_opt}Построчная оценка трудоемкости алгоритма Винограда с оптимизациями}
+        \begin{tabular}{|l|c|}
+            \hline
+            Строка кода & Вес \\
+            \hline
+            rows1 = len(matrix1) & 1 \\ 
+            \hline
+            columns2 = len(matrix2[0]) & 2 \\ 
+            \hline
+            columns1 = len(matrix1[0]) & 2 \\ 
+            \hline
+            row = [0] * rows1 & $rows1 \cdot 2$ \\ 
+            \hline
+            column = [0] * columns2 & $columns2 \cdot 2$\\ 
+            \hline
+            for i in range(rows1): & 3 \\ 
+            \hline
+            for j in range(columns1 // 2): & 5 \\ 
+            \hline
+            row[i] += matrix1[i][j $<<$ 1] * matrix1[i][(j $<<$ 1) + 1] & 11 \\ 
+            \hline
+            for i in range(columns2): & 3 \\ 
+            \hline
+            for j in range(columns1 // 2): & 5 \\ 
+            \hline
+            column[i] += matrix2[j $<<$ 1][i] * matrix2[(j $<<$ 1) + 1][i] & 11 \\ 
+            \hline
+            for i in range(rows1): & 3\\ 
+            \hline
+            buf = -row[i] & 3 \\ 
+            \hline
+            for j in range(columns2): & 3 \\ 
+            \hline
+            matrix\_res[i][j] = buf - column[j] & 5 \\ 
+            \hline
+            for k in range(columns1 // 2): & 5 \\ 
+            \hline
+            ind = k $<<$ 1 & 2 \\ 
+            \hline
+            matrix\_res[i][j] += (matrix1[i][ind + 1] + matrix2[ind][j]) * & \\ (matrix1[i][ind] + matrix2[ind + 1][j]) & 17 \\ 
+            \hline
+            if columns1 \% 2 == 1: & 3 \\ 
+            \hline
+            for i in range(rows1): & 3 \\ 
+            \hline
+            buf = matrix1[i][columns1 - 1] & 4 \\ 
+            \hline
+            for j in range(columns2): & 3\\ 
+            \hline
+            matrix\_res[i][j] += buf * matrix2[columns1 - 1][j] & 8 \\ 
+            \hline
+            return matrix\_res & 0 \\ 
+            \hline
+		\end{tabular}
+        \end{threeparttable}
+    \end{center}
+    \end{table}
+
+    \FloatBarrier
+    
+    \clearpage
+    Подсчет трудоемкости.
+    
+    \begin{itemize}
+        \item Создание вспомогательных массивов: 
+        \begin{equation}
+            f_{arr} = 2 \cdot (rows1 + columns1)
+        \end{equation}
+        
+        \item Работа с массивом $row$ (первый цикл):
+        \begin{equation}
+            f_{row} = 2 + rows1 \cdot (4 + 13 \cdot \frac{columns1}{2})
+        \end{equation}
+        
+        \item Работа с массивом $column$ (второй цикл):
+        \begin{equation}
+            f_{column} = 2 + columns2 \cdot (4 + 13 \cdot \frac{columns1}{2})
+        \end{equation}
+        
+        \item Цикл заполнения результирующей матрицы: 
+        \begin{equation}
+            f_{res} = 2 + rows1 \cdot (7 + columns2 \cdot (9 + \frac{21}{2} \cdot columns1))
+        \end{equation}
+        
+        \item Дополнительный цикл, если матрица нечетного размера: 
+        \begin{equation}
+            f_{extra} = 2 + rows1 \cdot (8 + 10 \cdot columns2)
+        \end{equation}
+    \end{itemize}
+    
+    Трудоемкость для лучшего случая (количество столбцов первой матрицы -- четное):
+    \begin{equation}
+    \begin{split}
+        f = 2f_{arr} + f_{row} + f_{column} + f_{res} + 2 \approx \\
+        \approx 10.5 \cdot rows1 \cdot columns1 \cdot columns2
+    \end{split}
+    \end{equation}
+    
+    Трудоемкость для худшего случая (количество столбцов первой матрицы -- нечетное):
+    \begin{equation}
+    \begin{split}
+        f = 2f_{arr} + f_{row} + f_{column} + f_{res} + f_{extra} \approx \\
+        \approx 10.5 \cdot rows1 \cdot columns1 \cdot columns2
+    \end{split}
+    \end{equation}
+    
+\end{itemize}
+
+\clearpage
+
+\section{Исходные файлы программы}
+Программа состоит из следующих модулей:
+\begin{itemize}
+	\item $main.py$ -- файл с главной функцией, вызывающей меню программы;
+	\item $cdio.py$ -- файл с функциями, осуществляющими ввод и вывод данных;
+    \item $multi\_matrix.py$ -- файл, содержащий код алгоритмов умножения матриц;
+    \item $proc\_time.py$ -- файл с функциями подсчета процессорного времени алгоритмов.
+    \newline
+\end{itemize}
+
+\section*{Вывод}
+В этом разделе были представлены схемы классического алгоритма умножения матриц и алгоритма Винограда с оптимизациями и без, вывод оценки их трудоемкости и выбранные типы данных.
+
+Проведя анализ трудоемкости алгоритмов, можно сказать, что между классическим алгоритмом умножения матриц и алгоритмом Винограда не столь большая разница, однако алгоритм Винограда с введенными оптимизациями теоретически работает уже значительно быстрее.

@@ -168,71 +168,61 @@ void save_result(std::vector<res_time_t> &time_result_arr,
     time_result_arr[index].end = end_time;
 }
 
-void task1(queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t> &qB1, queue<matrix_t> &qB2)
+void task1(mutex &m1, queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t> &qB1, queue<matrix_t> &qB2)
 {
-    mutex m;
-
-    m.lock();
     matrix_t tmp_matrixA = qA1.front();
     matrix_t tmp_matrixB = qB1.front();
-    m.unlock();
 
     tmp_matrixA = change_matrix(tmp_matrixA);
     tmp_matrixB = change_matrix(tmp_matrixB);
 
-    m.lock();
+    m1.lock();
     qA2.push(tmp_matrixA);
     qB2.push(tmp_matrixB);
-    m.unlock();
+    m1.unlock();
 
-    m.lock();
     qA1.pop();
     qB1.pop();
-    m.unlock();
 }
 
-void task2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t> &qB2, queue<matrix_t> &qB3)
+void task2(mutex &m1, mutex &m2, queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t> &qB2, queue<matrix_t> &qB3)
 {
-    mutex m;
 
-    m.lock();
+    m1.lock();
     matrix_t tmp_matrixA = qA2.front();
     matrix_t tmp_matrixB = qB2.front();
-    m.unlock();
+    m1.unlock();
 
     tmp_matrixA = truncate_matrix(tmp_matrixA);
     tmp_matrixB = truncate_matrix(tmp_matrixB);
 
-    m.lock();
+    m2.lock();
     qA3.push(tmp_matrixA);
     qB3.push(tmp_matrixB);
-    m.unlock();
+    m2.unlock();
 
-    m.lock();
+    m1.lock();
     qA2.pop();
     qB2.pop();
-    m.unlock();
+    m1.unlock();
 }
 
-void task3(queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t> &q_res)
+void task3(mutex &m2, queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t> &q_res)
 {
-    mutex m;
 
-    m.lock();
+    m2.lock();
     matrix_t tmp_matrixA = qA3.front();
     matrix_t tmp_matrixB = qB3.front();
-    m.unlock();
+    m2.unlock();
 
     matrix_t tmp_matrix = mul_matrix(tmp_matrixA, tmp_matrixB);
 
-    m.lock();
     q_res.push(tmp_matrix);
-    m.unlock();
 
-    m.lock();
+    m2.lock();
     qA3.pop();
     qB3.pop();
-    m.unlock();
+    m2.unlock();
 }
 
 void liner(int size, int cnt, bool is_count)
@@ -250,7 +240,7 @@ void liner(int size, int cnt, bool is_count)
 
     std::vector<res_time_t> time_result_arr;
     init_time_result_arr(time_result_arr, time_begin, cnt, 3);
-
+    mutex m1, m2;
     for (int i = 0 ; i < cnt; i++)
     {
         matrix_t matrA = generate_matrix(size, size);
@@ -262,19 +252,19 @@ void liner(int size, int cnt, bool is_count)
     for (int i = 0; i < cnt; i++)
     {
         time_start = chrono::system_clock::now();
-        task1(ref(qA1), ref(qA2), ref(qB1), ref(qB2));
+        task1(ref(m1), ref(qA1), ref(qA2), ref(qB1), ref(qB2));
         time_end = std::chrono::system_clock::now();
 
         save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, i + 1, 1);
 
         time_start = chrono::system_clock::now();
-        task2(ref(qA2), ref(qA3), ref(qB2), ref(qB3));
+        task2(ref(m1), ref(m2), ref(qA2), ref(qA3), ref(qB2), ref(qB3));
         time_end = std::chrono::system_clock::now();
 
         save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, i + 1, 2);
 
         time_start = chrono::system_clock::now();
-        task3(ref(qA3), ref(qB3), ref(q_res));
+        task3(ref(m2), ref(qA3), ref(qB3), ref(q_res));
         time_end = std::chrono::system_clock::now();
 
         save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, i + 1, 3);
@@ -291,14 +281,14 @@ void liner(int size, int cnt, bool is_count)
     }
 }
 
-void parallel_stage_1(queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t> &qB1, queue<matrix_t> &qB2, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA1_is_empty)
+void parallel_stage_1(queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t> &qB1, queue<matrix_t> &qB2, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA1_is_empty, mutex &m1)
 {
     chrono::time_point<chrono::system_clock> time_start, time_end;
     int task_num = 1;
     while(!qA1.empty())
     {
         time_start = chrono::system_clock::now();
-        task1(qA1, qA2, qB1, qB2);
+        task1(m1, qA1, qA2, qB1, qB2);
         time_end = std::chrono::system_clock::now();
         save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, task_num, 1);
         state[task_num - 1].stage_1 = true;
@@ -307,7 +297,7 @@ void parallel_stage_1(queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t
     qA1_is_empty = true;
 }
 
-void parallel_stage_2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t> &qB2, queue<matrix_t> &qB3, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA1_is_empty, bool &qA2_is_empty)
+void parallel_stage_2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t> &qB2, queue<matrix_t> &qB3, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA1_is_empty, bool &qA2_is_empty, mutex &m1, mutex &m2)
 {
     chrono::time_point<chrono::system_clock> time_start, time_end;
     int task_num = 1;
@@ -318,7 +308,7 @@ void parallel_stage_2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t
             if(state[task_num - 1].stage_1 == true)
             {
                 time_start = chrono::system_clock::now();
-                task2(qA2, qA3, qB2, qB3);
+                task2(m1, m2, qA2, qA3, qB2, qB3);
                 time_end = std::chrono::system_clock::now();
 
                 save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, task_num, 2);
@@ -333,7 +323,7 @@ void parallel_stage_2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t
     qA2_is_empty = true;
 }
 
-void parallel_stage_3(queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t> &q_res, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA2_is_empty, int cnt)
+void parallel_stage_3(queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t> &q_res, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA2_is_empty, int cnt, mutex &m2)
 {
     chrono::time_point<chrono::system_clock> time_start, time_end;
     int task_num = 1;
@@ -344,7 +334,7 @@ void parallel_stage_3(queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t
             if(state[task_num - 1].stage_2 == true)
             {
                 time_start = chrono::system_clock::now();
-                task3(qA3, qB3, q_res);
+                task3(m2, qA3, qB3, q_res);
                 time_end = std::chrono::system_clock::now();
                 save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, task_num, 3);
                 state[task_num - 1].stage_3 = true;
@@ -365,6 +355,7 @@ void parallel(int size, int cnt, bool is_count)
     queue<matrix_t> qA3;
     queue<matrix_t> qB3;
     queue<matrix_t> q_res;
+    mutex m1, m2;
 
     for (int i = 0; i < cnt; i++)
     {
@@ -388,9 +379,9 @@ void parallel(int size, int cnt, bool is_count)
     vector<res_time_t> time_result_arr;
     init_time_result_arr(time_result_arr, time_begin, cnt, 3);
     thread threads[3];
-    threads[0] = thread(parallel_stage_1, ref(qA1), ref(qA2), ref(qB1), ref(qB2), ref(state), ref(time_result_arr), ref(qA1_is_empty));
-    threads[1] = thread(parallel_stage_2, ref(qA2), ref(qA3), ref(qB2), ref(qB3), ref(state), ref(time_result_arr), ref(qA1_is_empty), ref(qA2_is_empty));
-    threads[2] = thread(parallel_stage_3, ref(qA3), ref(qB3), ref(q_res), ref(state), ref(time_result_arr), ref(qA2_is_empty), cnt);
+    threads[0] = thread(parallel_stage_1, ref(qA1), ref(qA2), ref(qB1), ref(qB2), ref(state), ref(time_result_arr), ref(qA1_is_empty), ref(m1));
+    threads[1] = thread(parallel_stage_2, ref(qA2), ref(qA3), ref(qB2), ref(qB3), ref(state), ref(time_result_arr), ref(qA1_is_empty), ref(qA2_is_empty), ref(m1), ref(m2));
+    threads[2] = thread(parallel_stage_3, ref(qA3), ref(qB3), ref(q_res), ref(state), ref(time_result_arr), ref(qA2_is_empty), cnt, ref(m2));
     for (int i = 0; i < 3; i++)
         threads[i].join();
     if(is_count)
