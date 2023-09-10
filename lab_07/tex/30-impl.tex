@@ -1,0 +1,87 @@
+\chapter{Технологическая часть}
+В данном разделе будут приведены требования к программному обеспечению, средства реализации и листинги кода.
+
+\section{Требования к ПО}
+
+К программе предъявляется ряд требований:
+\begin{itemize}[label = ---]
+	\item на вход подаётся ключ, значение которого необходимо найти;
+	\item на выходе --- два результата поиска в словаре (для каждого алгоритма выводится отдельный результат).
+\end{itemize}
+
+\section{Средства реализации}
+
+В качестве языка программирования (ЯП) для реализации данной лабораторной работы был выбран ЯП Python \cite{pythonlang}. Время реализации работы алгоритмов было замерено с помощью функции
+ process\_time() из библиотеки time \cite{pythonlangtime}. 
+
+\section{Реализация алгоритмов}
+В листинге \ref{lst:bfs} представлена реализация алгоритма поиска в словаре полным перебором.
+\clearpage
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	
+\begin{lstlisting}[label=lst:bfs,caption=Реализация алгоритма поиска полным перебором]
+def BruteForceSearch(self, key):
+	k = 0
+	kk = list(self.data.keys())
+	for elem in self.data:
+		k += 1
+		if key == elem:
+			// Writing to the log file 
+			self.f.write(f"{kk.index(key)},{key},{k}\n") 
+			return self.data[elem]
+	return -1
+\end{lstlisting}
+\end{center}
+
+В листинге \ref{lst:bs} представлена реализация алгоритма бинарного поиска в словаре.
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:bs,caption=Реализация алгоритма бинарного поиска]
+def BinarySearch(self, key, list_keys):
+	l, r = 0, len(list_keys) - 1
+	k = 0
+	kk = list(self.data.keys())
+	while l <= r:
+		middle = (r + l) 
+		elem = list_keys[middle]
+		k += 1
+		if elem == key:
+			// Writing to the log file 
+			self.f1.write(f"{kk.index(key)},{key},{k}\n")
+			return self.data[elem]
+		elif elem < key:
+			l = middle + 1
+		else:
+			r = middle - 1
+	return -1
+\end{lstlisting}
+\end{center}
+
+\section{Функциональное тестирование}
+
+В данном разделе будет приведена таблица \ref{table:ref1} с тестами.
+\begin{center}
+	\captionsetup{justification=raggedleft,singlelinecheck=off}
+\begin{table}[ht]
+	\centering
+	\caption{Таблица тестов}
+	\label{table:ref1}
+	\begin{tabular}{ |c|c|c|}
+		\hline
+		Входные данные    & Пояснение   	  & Результат    \\ \hline
+		\hline
+		Moscow			  & Средний элемент   & Ответ верный \\ \hline
+		Tokyo 			  & Первый элемент    & Ответ верный \\ \hline
+		Belgium 		  & Последний элемент & Ответ верный \\ \hline
+		123 & Несуществующий элемент & Ответ верный (-1) \\ \hline
+		Mosccow & Несуществующий элемент & Ответ верный (-1) \\ \hline
+	\end{tabular}
+\end{table}
+\end{center}
+Все тесты пройдены успешно для всех реализаций алгоритмов.
+
+
+\section{Вывод}
+В данном разделе были представлены листинги рассматриваемых алгоритмов поиска в словаре, приведена информация о средствах реализации, сведения о модулях программы и было проведено функциональное тестирование.

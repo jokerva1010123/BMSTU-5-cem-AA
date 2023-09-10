@@ -1,0 +1,277 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут приведены требования к программному обеспечению, средства реализации, листинги кода, а также функциональные тесты.
+
+\section{Требования к программному обеспечению}
+
+В качестве входных данных задается количество строк и столбцов матрицы $matr$, которое должно быть больше 0, а все элементы матрицы имеют тип $int$. Количество матриц больше 0.
+Выходные данные --- табличка с номерами матриц, номерами этапов (лент) её обработки, временем начала обработки текущей матрицы на текущей ленте, временем окончания обработки текущей матрицы на текущей ленте.
+
+\section{Выбор языка программирования}
+
+В данной работе для реализации был выбран язык программирования \textit{C++}~\cite{bib2}, так как он предоставляет весь необходимый функционал для выполнения работы. Для замера времени работы использовалась функция \textit{std::chrono::system\_clock::now()}~\cite{bib3}.
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{lst:parallel_processing} - \ref{lst:stage_3} представлены функции для конвейерного и ленейного алгоритмов обработки матриц.
+\newpage
+\begin{lstlisting}[label=lst:parallel_processing,caption=Функция алгоритма конвейерной обработки матрицы]
+void parallel(int size, int cnt, bool is_count)
+{
+    queue<matrix_t> qA1;
+    queue<matrix_t> qB1;
+    queue<matrix_t> qA2;
+    queue<matrix_t> qB2;
+    queue<matrix_t> qA3;
+    queue<matrix_t> qB3;
+    queue<matrix_t> q_res;
+
+    for (int i = 0; i < cnt; i++)
+    {
+        matrix_t matrA = generate_matrix(size, size);
+        matrix_t matrB = generate_matrix(size, size);
+        qA1.push(matrA);
+        qB1.push(matrB);
+    }
+    bool qA1_is_empty = false;
+    bool qA2_is_empty = false;
+    vector<matrix_state_t> state(cnt);
+    for (int i = 0; i < cnt; i++)
+    {
+        matrix_state_t tmp_state;
+        tmp_state.stage_1 = false;
+        tmp_state.stage_2 = false;
+        tmp_state.stage_3 = false;
+        state[i] = tmp_state;
+    }
+    chrono::time_point<std::chrono::system_clock> time_begin = chrono::system_clock::now();
+    vector<res_time_t> time_result_arr;
+    init_time_result_arr(time_result_arr, time_begin, cnt, 3);
+    thread threads[3];
+    threads[0] = thread(parallel_stage_1, ref(qA1), ref(qA2), ref(qB1), ref(qB2), ref(state), ref(time_result_arr), ref(qA1_is_empty));
+    threads[1] = thread(parallel_stage_2, ref(qA2), ref(qA3), ref(qB2), ref(qB3), ref(state), ref(time_result_arr), ref(qA1_is_empty), ref(qA2_is_empty));
+    threads[2] = thread(parallel_stage_3, ref(qA3), ref(qB3), ref(q_res), ref(state), ref(time_result_arr), ref(qA2_is_empty), cnt);
+    for (int i = 0; i < 3; i++)
+        threads[i].join();
+    if(is_count)
+        printf("     %4d      |     %4d      |   %.6f  \n",
+            size, cnt, time_result_arr[cnt - 1].end);
+    else
+        print_res_time(time_result_arr, cnt * 3);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:linear_processing,caption=Функция алгоритма линейной обработки матрицы]
+void liner(int size, int cnt, bool is_count)
+{
+    queue<matrix_t> qA1;
+    queue<matrix_t> qB1;
+    queue<matrix_t> qA2;
+    queue<matrix_t> qB2;
+    queue<matrix_t> qA3;
+    queue<matrix_t> qB3;
+    queue<matrix_t> q_res;
+
+    std::chrono::time_point<std::chrono::system_clock> time_start, time_end,
+    time_begin = std::chrono::system_clock::now();
+
+    std::vector<res_time_t> time_result_arr;
+    init_time_result_arr(time_result_arr, time_begin, cnt, 3);
+
+    for (int i = 0 ; i < cnt; i++)
+    {
+        matrix_t matrA = generate_matrix(size, size);
+        matrix_t matrB = generate_matrix(size, size);
+        qA1.push(matrA);
+        qB1.push(matrB);
+    }
+    for (int i = 0; i < cnt; i++)
+    {
+        time_start = chrono::system_clock::now();
+        task1(ref(qA1), ref(qA2), ref(qB1), ref(qB2));
+        time_end = std::chrono::system_clock::now();
+        save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, i + 1, 1);
+        time_start = chrono::system_clock::now();
+        task2(ref(qA2), ref(qA3), ref(qB2), ref(qB3));
+        time_end = std::chrono::system_clock::now();
+        save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, i + 1, 2);
+        time_start = chrono::system_clock::now();
+        task3(ref(qA3), ref(qB3), ref(q_res));
+        time_end = std::chrono::system_clock::now();
+        save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, i + 1, 3);
+    }
+    if(is_count)
+        printf("     %4d      |     %4d      |   %.6f  \n",
+            size, cnt, time_result_arr[cnt - 1].end);
+    else
+        print_res_time(time_result_arr, cnt * 3);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:parallel_stage_1,caption=Функция 1-ой ленты конвейерной обработки матрицы]
+void parallel_stage_1(queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t> &qB1, queue<matrix_t> &qB2, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA1_is_empty)
+{
+    chrono::time_point<chrono::system_clock> time_start, time_end;
+    int task_num = 1;
+    while(!qA1.empty())
+    {
+        time_start = chrono::system_clock::now();
+        task1(qA1, qA2, qB1, qB2);
+        time_end = std::chrono::system_clock::now();
+        save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, task_num, 1);
+        state[task_num - 1].stage_1 = true;
+        task_num ++;
+    }
+    qA1_is_empty = true;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:parallel_stage_2,caption=Функция 2-ой ленты конвейерной обработки матрицы]
+void parallel_stage_2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t> &qB2, queue<matrix_t> &qB3, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA1_is_empty, bool &qA2_is_empty)
+{
+    chrono::time_point<chrono::system_clock> time_start, time_end;
+    int task_num = 1;
+    while(1)
+    {
+        if(qA2.empty() == false)
+        {
+            if(state[task_num - 1].stage_1 == true)
+            {
+                time_start = chrono::system_clock::now();
+                task2(qA2, qA3, qB2, qB3);
+                time_end = std::chrono::system_clock::now();
+
+                save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, task_num, 2);
+
+                state[task_num - 1].stage_2 = true;
+                task_num ++;  
+            }
+        }
+        else if(qA1_is_empty)
+                break;
+    }
+    qA2_is_empty = true;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:parallel_stage_3,caption=Функция 3-ей ленты конвейерной обработки матрицы]
+void parallel_stage_3(queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t> &q_res, vector<matrix_state_t> &state, vector<res_time_t> &time_result_arr, bool &qA2_is_empty, int cnt)
+{
+    chrono::time_point<chrono::system_clock> time_start, time_end;
+    int task_num = 1;
+    while(1)
+    {
+        if(qA3.empty() == false)
+        {
+            if(state[task_num - 1].stage_2 == true)
+            {
+                time_start = chrono::system_clock::now();
+                task3(qA3, qB3, q_res);
+                time_end = std::chrono::system_clock::now();
+                save_result(time_result_arr, time_start, time_end, time_result_arr[0].time_begin, task_num, 3);
+                state[task_num - 1].stage_3 = true;
+                task_num ++;
+            }
+        }
+        else if(qA2_is_empty)
+            break;
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:stage_1,caption=Функция реализации 1-ого этапа обработки матрицы]
+void task1(queue<matrix_t> &qA1, queue<matrix_t> &qA2, queue<matrix_t> &qB1, queue<matrix_t> &qB2)
+{
+    mutex m;
+    m.lock();
+    matrix_t tmp_matrixA = qA1.front();
+    matrix_t tmp_matrixB = qB1.front();
+    m.unlock();
+    tmp_matrixA = change_matrix(tmp_matrixA);
+    tmp_matrixB = change_matrix(tmp_matrixB);
+    m.lock();
+    qA2.push(tmp_matrixA);
+    qB2.push(tmp_matrixB);
+    m.unlock();
+    m.lock();
+    qA1.pop();
+    qB1.pop();
+    m.unlock();
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:stage_2,caption=Функция реализации 2-ого этапа обработки матрицы]
+void task2(queue<matrix_t> &qA2, queue<matrix_t> &qA3, queue<matrix_t> &qB2, queue<matrix_t> &qB3)
+{
+    mutex m;
+    m.lock();
+    matrix_t tmp_matrixA = qA2.front();
+    matrix_t tmp_matrixB = qB2.front();
+    m.unlock();
+    tmp_matrixA = truncate_matrix(tmp_matrixA);
+    tmp_matrixB = truncate_matrix(tmp_matrixB);
+    m.lock();
+    qA3.push(tmp_matrixA);
+    qB3.push(tmp_matrixB);
+    m.unlock();
+    m.lock();
+    qA2.pop();
+    qB2.pop();
+    m.unlock();
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:stage_3,caption=Функция реализации 3-его этапа обработки матрицы]
+void task3(queue<matrix_t> &qA3, queue<matrix_t> &qB3, queue<matrix_t> &q_res)
+{
+    mutex m;
+    m.lock();
+    matrix_t tmp_matrixA = qA3.front();
+    matrix_t tmp_matrixB = qB3.front();
+    m.unlock();
+    matrix_t tmp_matrix = mul_matrix(tmp_matrixA, tmp_matrixB);
+    m.lock();
+    q_res.push(tmp_matrix);
+    m.unlock();
+    m.lock();
+    qA3.pop();
+    qB3.pop();
+    m.unlock();
+}
+\end{lstlisting}
+
+\section{Функциональные тесты}
+
+В таблице \ref{tbl:functional_test} приведены функциональные тесты для конвейерного и ленейного алгоритмов обработки матриц. Все тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+		\captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:functional_test} Функциональные тесты}
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			Строк & Столбцов & Метод обр. & Алгоритм & Ожидаемый результат 
+			\\ \hline
+			0 & 10 & 10 & Конвейерный & Сообщение об ошибке 
+			\\ \hline
+			k & 10 & 10 & Конвейерный & Сообщение об ошибке 
+			\\ \hline
+			10 & 0 & 10 & Конвейерный & Сообщение об ошибке 
+			\\ \hline
+			10 & k & 10 & Конвейерный & Сообщение об ошибке 
+			\\ \hline
+			10 & 10 & -5 & Конвейерный & Сообщение об ошибке 
+			\\ \hline
+			10 & 10 & k & Конвейерный & Сообщение об ошибке 
+			\\ \hline
+			100 & 100 & 20 & Конвейерный & Вывод результ. таблички
+			\\ \hline
+			100 & 100 & 20 & Линейный & Вывод результ. таблички
+			\\ \hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+В данном разделе были описаны средства реализации и требования к программе, разработаны алгоритмы для конвейерного и ленейного алгоритмов обработки матриц и проведено тестирование.

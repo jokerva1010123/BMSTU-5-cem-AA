@@ -1,0 +1,148 @@
+\chapter{Технологическая часть}
+
+В данном разделе были приведены средства реализации и листинги кода.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран язык программирования C++ \cite{Cpp}. Данный язык имеет все небходимые инструменты для решения поставленной задачи.
+
+\section{Сведения о модулях программы}
+Программа состоит из одного модуля --- $main.cpp$ — файл, содержащий код последовательного и параллельного алгоритмов и вывода замеренного процессорного времени.
+
+
+\section{Реализация алгоритмов}
+В листинге \ref{lst:lst1} и \ref{lst:lst2} представлена реализация последовательного и параллельного алгоритма.
+
+\begin{lstlisting}[label=lst:lst1,caption=Последовательный алгоритм]
+void find_standard(double **matrix, int n, int m, double *max_element, int *posi, int *posj, double average)
+{
+    *max_element = matrix[0][0];
+    *posi = -1;
+    *posj = -1;
+    for (int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++)
+        {
+            if (*max_element < matrix[i][j])
+                *max_element = matrix[i][j];
+            if (matrix[i][j] > average)
+                if (*posi == -1)
+                {
+                    *posi = i;
+                    *posj = j;
+                }
+                else if (matrix[*posi][*posj] > matrix[i][j])
+                {
+                    *posi = i;
+                    *posj = j;
+                }
+        }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:lst2,caption=Параллельный алгоритм]
+void for_parallel(double **matrix, int n, int m, double *max_element, int *posi, int *posj, double average)
+{
+    for (int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++)
+        {
+            if (*max_element < matrix[i][j])
+                *max_element = matrix[i][j];
+            if (matrix[i][j] > average)
+                if (*posi == -1)
+                {
+                    *posi = i;
+                    *posj = j;
+                }
+                else if (matrix[*posi][*posj] > matrix[i][j])
+                {
+                    *posi = i;
+                    *posj = j;
+                }
+        }
+}
+
+void find_parallel(double **matrix, int n, int m, double *max_element, int *posi, int *posj, double average, int size)
+{
+    *posi = -1;
+    *posj = -1;
+    *max_element = matrix[0][0];
+    thread potok[size];  
+    for (int i = 0; i < size; i++)
+        potok[i] = thread(for_parallel, matrix, n, m, max_element, posi, posj, average);
+    for (int i = 0; i < size; i++)
+        potok[i].join();
+}
+\end{lstlisting}
+
+\section{Функциональные тесты}
+
+В таблице \ref{tbl:functional_test} приведены тесты для функций, реализующих алгоритмы изменения матрицы действительных чисел. Тесты пройдены успешно.
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+		\captionsetup{justification=raggedright,singlelinecheck=off}
+		\caption{\label{tbl:functional_test} Функциональные тесты}
+		\begin{tabular}{|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|}
+			\hline
+			Матрица А  & Результат \\ 
+			\hline
+
+			$\begin{pmatrix}
+				1 & 1\\
+                27 & 729
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 & 1\\
+                729 & 729
+			\end{pmatrix}$ \\
+                
+                \hline
+
+			$\begin{pmatrix}
+				    5 & -1
+			\end{pmatrix}$ &
+			Can't find average of matrix\\
+   
+                \hline
+
+			$\begin{pmatrix}
+				1 & 1 & 1\\
+				1 & 1 & 1 \\
+				1 & 1 & 1
+			\end{pmatrix}$ &
+			Can't find number greater than average of matrix \\
+   
+                \hline
+
+			$\begin{pmatrix}
+				1 & 2\\
+				3 & 1
+			\end{pmatrix}$  &
+			$\begin{pmatrix}
+				1 & 3\\
+				3 & 3
+			\end{pmatrix}$ \\
+                \hline
+                $\begin{pmatrix}
+				1 & 2 & 3\\
+				4 & 5 & 6\\
+				1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 & 2 & 6\\
+				4 & 5 & 6\\
+				1 & 2 & 3
+			\end{pmatrix}$ \\
+
+            \hline
+
+		\end{tabular}
+		\end{threeparttable}
+	\end{center}
+	
+\end{table}
+
+\section*{Вывод}
+
+В этом разделе была представлена реализация последовательного и параллельного алгоритмов  Тестирование показало, что алгоритмы реализованы правильно и работают корректно.
